@@ -1,13 +1,19 @@
-# Yabridge Controller
+# Yabridge GUI Controller
 
 ## Overview
 
-Yabridge Controller is a PyQt5-based GUI application designed to manage VST2 and VST3 plugins via yabridge. It allows you to scan and sync VST plugins, display lists of converted plugins, and check the status of yabridge and Wine installations.
+Yabridge is a command-line tool that converts Windows VST/VST3 plugins into Linux-native plugins, enabling you to run them via Wine. This PyQt5-based GUI application simplifies managing and converting VST2 and VST3 plugins installed through Wine. With this application, you can:
+
+- Scan and synchronize your VST plugins.
+- Display lists of converted plugins.
+- Check the status of converted plugins.
+
+This tool streamlines the process of using Windows plugins seamlessly on a Linux system.
 
 ## Features
 
-- **Environment Checks**: Verifys if `yabridgectl` and Wine are installed.
-- **Plugin Lists**: Display lists of converted VST2 and VST3 plugins.
+- **Environment Checks**: Verifys if `Yabridge` and `Wine` are installed.
+- **Plugin Lists**: Display lists of integrated VST2 and VST3 plugins.
 - **Scan Plugins**: Sync plugins using `yabridgectl sync` and update the plugin lists.
 
 ## Installation
@@ -21,10 +27,10 @@ Ensure you have the necessary packages installed. For most Linux distributions, 
 - wine-staging
 - yabridge
 
-### What should I exactly do?
-
 #### Arch-based distros (Arch,Manjaro, Garuda etc)
+
 If you are in an Arch based distro copy the following, paste it into a terminal and hit [Enter].
+
 ```sh
 sudo pacman -S python-pyqt5 wine-staging yabridge yabridgectl
 ```
@@ -48,8 +54,7 @@ This project is licensed under the GNU License. See the [LICENSE](LICENSE) file 
 ## Acknowledgments
 
 - **PyQt5**: For providing the graphical interface framework.
-- **yabridgectl**: For managing VST plugins in Wine.
+- **Yabridge**: For managing VST plugins in Wine.
+- **Wine**: For providing the Windows execution environment.
 
-## Contact
 
-For questions or suggestions, please contact [apapamarkou@yahoo.com](mailto:apapamarkou@yahoo.com).

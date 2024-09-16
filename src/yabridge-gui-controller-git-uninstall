@@ -1,0 +1,25 @@
+#!/bin/bash
+
+REPO_URL="https://github.com/apapamarkou/yabridge-gui-controller.git"
+
+# Clone the repository
+echo "Cloning the repository..."
+git clone "$REPO_URL"
+
+# Change to the repository directory
+cd "$REPO_DIR" || { echo "Failed to change directory to $REPO_DIR"; exit 1; }
+
+echo "Making all files executable..."
+chmod a+x install.sh
+
+echo "Running the install script..."
+./uninstall.sh
+
+# Return to the previous directory
+cd ..
+
+# Remove the cloned repository directory
+echo "Cleaning up..."
+rm -rf "$REPO_DIR"
+
+echo "Uninstallation complete."
