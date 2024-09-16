@@ -3,6 +3,8 @@
 #
 # A yabridge GUI controller
 #
+# Uninstall script
+#
 # Created by Andrianos Papamarkou
 #
 

@@ -3,6 +3,8 @@
 #
 # A yabridge GUI controller
 #
+# Uninstall script
+#
 # Created by Andrianos Papamarkou
 #
 
@@ -20,4 +22,3 @@ echo "Removing $ICON_DIR/$APP_NAME.png"
 rm f $ICON_DIR/$APP_NAME.png
 
 echo "Done!"
-

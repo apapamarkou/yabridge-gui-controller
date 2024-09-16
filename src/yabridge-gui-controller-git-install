@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#
+# A yabridge GUI controller
+#
+# GitHub direct install script
+#
+# Created by Andrianos Papamarkou
+#
+
 REPO_URL="https://github.com/apapamarkou/yabridge-gui-controller.git"
 
 # Clone the repository
