@@ -10,6 +10,8 @@ Yabridge is a command-line tool that converts Windows VST/VST3 plugins into Linu
 
 This tool streamlines the process of using Windows plugins seamlessly on a Linux system.
 
+If you dont know how to install wine-staging and yabridge on your system, you can follow my tutorial.
+
 ## Features
 
 - **Environment Checks**: Verifys if `Yabridge` and `Wine` are installed.
@@ -24,18 +26,40 @@ Ensure you have the necessary packages installed.
 
 - puthon3-pyqt6
 - python3-pyqt6.qtsvg
-- wine-staging
-- yabridge
+- git
+- wget
 
-#### Arch-based distros (Arch,Manjaro, Garuda etc)
+#### Install the dependencies
 
-If you are in an Arch based distro copy the following, paste it into a terminal and hit [Enter].
+To install and operate you need `pyqt6`, `git` and `wget`:
+
+- **Arch** based distros
 
 ```sh
-sudo pacman -S python-pyqt6 wine-staging yabridge yabridgectl
+sudo pacman -S --needed python-pyqt6 wget git
 ```
 
-### Installation
+- **Debian/Ubuntu** based distros
+
+```sh
+sudo apt install python3-pyqt6 wget git
+```
+
+### Installation/Update
+
+Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
+
+```sh
+wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-install | bash
+```
+
+### Uninstallation
+
+Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
+
+```sh
+wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-install | bash
+```
 
 ## Usage
 
@@ -56,5 +80,3 @@ This project is licensed under the GNU License. See the [LICENSE](LICENSE) file 
 - **PyQt**: For providing the graphical interface framework.
 - **Yabridge**: For managing VST plugins in Wine.
 - **Wine**: For providing the Windows execution environment.
-
-
