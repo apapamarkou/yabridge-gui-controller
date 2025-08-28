@@ -40,8 +40,8 @@ cp "$SCRIPT_DIR/src/$APP_NAME.py" "$LOCAL_BIN_DIR"
 echo "Creating desktop entry..."
 echo "[Desktop Entry]
 Type=Application
-Name=Pipewire Audio Controller
-Comment=Control your audio
+Name=Yabridge GUI Controller
+Comment=Control your VSTs
 Exec=$LOCAL_BIN_DIR/$APP_NAME.py $1
 Icon=$ICON_DIR/$APP_NAME.png
 Terminal=false
