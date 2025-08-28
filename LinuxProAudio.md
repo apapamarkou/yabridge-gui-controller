@@ -96,20 +96,20 @@ yes | sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wi
 sudo apt update && sudo apt -y install --install-recommends wine-staging
 ```
 
-- Edit .profile
+- Edit `environment` variables
 
 ```sh
 sudo nano /etc/environment
 ```
 
-- Add the following lines and then execute them to continue
+- Add the following lines
 
 ```sh
 PATH="/opt/wine-staging/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/>
 WINEFSYNC=1
 ```
 
-- Close the terminal
+- Reboot
 
 ## 2. Install and configure using `winetricks`
 
