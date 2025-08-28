@@ -22,8 +22,8 @@ This tool streamlines the process of using Windows plugins seamlessly on a Linux
 
 Ensure you have the necessary packages installed. For most Linux distributions, you can install the required dependencies using the following commands.
 
-- puthon3-pyqt5
-- python3-pyqt5.qtsvg
+- puthon3-pyqt6
+- python3-pyqt6.qtsvg
 - wine-staging
 - yabridge
 
