@@ -89,7 +89,7 @@ yes | sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wi
 ```
 
 ```sh
-yes | sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/$(lsb_release -cs)/winehq-$CODENAME.sources
+. /etc/os-release && yes | sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/$VERSION_CODENAME/winehq-$VERSION_CODENAME.sources
 ```
 
 ```sh
