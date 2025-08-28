@@ -99,14 +99,14 @@ sudo apt update && sudo apt -y install --install-recommends wine-staging
 - Edit .profile
 
 ```sh
-sudo nano .profile
+sudo nano /etc/environment
 ```
 
 - Add the following lines and then execute them to continue
 
 ```sh
-export PATH="/opt/wine-staging/bin:$PATH"
-export WINEFSYNC=1
+PATH="/opt/wine-staging/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/>
+WINEFSYNC=1
 ```
 
 - Close the terminal
