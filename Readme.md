@@ -2,7 +2,7 @@
 
 ## Overview
 
-Yabridge is a command-line tool that converts Windows VST/VST3 plugins into Linux-native plugins, enabling you to run them via Wine. This PyQt5-based GUI application simplifies managing and converting VST2 and VST3 plugins installed through Wine. With this application, you can:
+Yabridge is a command-line tool that converts Windows VST/VST3 plugins into Linux-native plugins, enabling you to run them via Wine. This PyQt-based GUI application simplifies managing and converting VST2 and VST3 plugins installed through Wine. With this application, you can:
 
 - Scan and synchronize your VST plugins.
 - Display lists of converted plugins.
@@ -32,7 +32,7 @@ Ensure you have the necessary packages installed. For most Linux distributions, 
 If you are in an Arch based distro copy the following, paste it into a terminal and hit [Enter].
 
 ```sh
-sudo pacman -S python-pyqt5 wine-staging yabridge yabridgectl
+sudo pacman -S python-pyqt6 wine-staging yabridge yabridgectl
 ```
 
 ### Installation
