@@ -58,7 +58,7 @@ wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/
 Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
 
 ```sh
-wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-install | bash
+wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-uninstall | bash
 ```
 
 ## Usage
