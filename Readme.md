@@ -20,7 +20,7 @@ This tool streamlines the process of using Windows plugins seamlessly on a Linux
 
 ### Dependencies
 
-Ensure you have the necessary packages installed. For most Linux distributions, you can install the required dependencies using the following commands.
+Ensure you have the necessary packages installed.
 
 - puthon3-pyqt6
 - python3-pyqt6.qtsvg
