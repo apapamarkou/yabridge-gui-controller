@@ -25,7 +25,6 @@ If you dont know how to install wine-staging and yabridge on your system, you ca
 Ensure you have the necessary packages installed.
 
 - puthon3-pyqt6
-- python3-pyqt6.qtsvg
 - git
 - wget
 
