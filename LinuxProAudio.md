@@ -70,47 +70,6 @@ export WINEFSYNC=1
 
 - Close the terminal
 
-#### 1.e Debian
-
-```sh
-sudo apt -y install wget cabextract
-```
-
-```sh
-sudo dpkg --add-architecture i386
-```
-
-```sh
-sudo mkdir -pm755 /etc/apt/keyrings
-```
-
-```sh
-yes | sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-```
-
-```sh
-. /etc/os-release && yes | sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/$VERSION_CODENAME/winehq-$VERSION_CODENAME.sources
-```
-
-```sh
-sudo apt update && sudo apt -y install --install-recommends wine-staging
-```
-
-- Edit `environment` variables
-
-```sh
-sudo nano /etc/environment
-```
-
-- Add the following lines
-
-```sh
-PATH="/opt/wine-staging/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/>
-WINEFSYNC=1
-```
-
-- Reboot
-
 ## 2. Install and configure using `winetricks`
 
 - Download latest `winetricks` script:
