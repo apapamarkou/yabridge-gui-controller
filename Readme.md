@@ -10,7 +10,7 @@ Yabridge is a command-line tool that converts Windows VST/VST3 plugins into Linu
 
 This tool streamlines the process of using Windows plugins seamlessly on a Linux system.
 
-If you dont know how to install wine-staging and yabridge on your system, you can follow my tutorial.
+If you dont know how to install wine-staging and yabridge on your system, you can [follow my tutorial](https://github.com/apapamarkou/yabridge-gui-controller/blob/main/LinuxProAudio.md).
 
 ## Features
 
