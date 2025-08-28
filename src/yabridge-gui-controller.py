@@ -2,23 +2,28 @@
 import os
 import subprocess
 import re
-from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QListWidget, QVBoxLayout,
+from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QListWidget, QVBoxLayout,
                              QLabel, QHBoxLayout, QPushButton, QWidget, QMessageBox,
                              QSpacerItem, QSizePolicy, QProgressBar, QDialog,
                              QDialogButtonBox)
 
 class SyncThread(QThread):
+    """Background thread for running yabridgectl sync command."""
     sync_completed = pyqtSignal(str)  # Signal to emit sync output when done
 
     def run(self):
+        """Execute yabridgectl sync command and emit results."""
         # Run the yabridgectl sync and capture output
         result = subprocess.run(["yabridgectl", "sync"], check=True, text=True, stdout=subprocess.PIPE)
         # Emit the captured output
         self.sync_completed.emit(result.stdout)
 
 class YabridgeController(QMainWindow):
+    """Main application window for Yabridge GUI Controller."""
+    
     def __init__(self):
+        """Initialize the main window and set up the application."""
         super().__init__()
         self.setWindowTitle("Yabridge Controller")
 
@@ -32,6 +37,7 @@ class YabridgeController(QMainWindow):
         self.load_plugins()
 
     def init_ui(self):
+        """Initialize and set up the user interface components."""
         self.vst2_list = QListWidget()
         self.vst3_list = QListWidget()
 
@@ -46,7 +52,7 @@ class YabridgeController(QMainWindow):
 
         # Align buttons to bottom-right
         button_layout = QHBoxLayout()
-        spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        spacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         button_layout.addItem(spacer)
         button_layout.addWidget(scan_button)
         button_layout.addWidget(about_button)
@@ -55,7 +61,7 @@ class YabridgeController(QMainWindow):
         layout = QVBoxLayout()
         # Title, centered
         title = QLabel("<h2>Converted Plugins</h2><hr/>")
-        title.setAlignment(Qt.AlignCenter)
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
         # Plugin lists
@@ -87,6 +93,7 @@ class YabridgeController(QMainWindow):
         self.setCentralWidget(container)
 
     def check_environment(self):
+        """Check if required tools (yabridge and wine) are installed."""
         # Check if yabridgectl is installed
         yabridge_installed = self.check_command("yabridgectl", "--version")
         if yabridge_installed:
@@ -106,6 +113,15 @@ class YabridgeController(QMainWindow):
             self.wine_status.setStyleSheet("color: red;")
 
     def check_command(self, command, version_flag):
+        """Check if a command is available by running it with version flag.
+        
+        Args:
+            command (str): Command to check
+            version_flag (str): Version flag to use
+            
+        Returns:
+            bool: True if command exists and runs successfully
+        """
         try:
             subprocess.run([command, version_flag], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             return True
@@ -113,6 +129,7 @@ class YabridgeController(QMainWindow):
             return False
 
     def load_plugins(self):
+        """Load and display VST2 and VST3 plugins in the UI lists."""
         # Get VST2 plugins
         vst2_plugins = self.get_vst_plugins("VST2", "~/.vst/yabridge/")
         self.vst2_list.clear()
@@ -123,14 +140,16 @@ class YabridgeController(QMainWindow):
         self.vst3_list.clear()
         self.vst3_list.addItems(vst3_plugins)
 
-    # def get_vst_plugins(self, plugin_type, plugin_dir):
-    #     # List plugins from the specified directories
-    #     plugin_path = os.path.expanduser(plugin_dir)
-    #     if not os.path.exists(plugin_path):
-    #         return []
-    #     return [f for f in os.listdir(plugin_path) if plugin_type in f]
-
     def get_vst_plugins(self, plugin_type, plugin_dir):
+        """Scan directory for VST plugins.
+        
+        Args:
+            plugin_type (str): Type of plugin (VST2 or VST3)
+            plugin_dir (str): Directory path to scan
+            
+        Returns:
+            list: List of plugin names found
+        """
         print ("Scan folder: {}",plugin_dir)
         # List plugins from the specified directory (files and folders)
         plugin_path = os.path.expanduser(plugin_dir)
@@ -151,6 +170,7 @@ class YabridgeController(QMainWindow):
         return plugins
 
     def scan_plugins(self):
+        """Start plugin scanning process with progress dialog."""
         # Show progress dialog with a 10-second progress bar
         self.progress_dialog = QDialog(self)
         self.progress_dialog.setWindowTitle("Scanning Plugins")
@@ -174,9 +194,10 @@ class YabridgeController(QMainWindow):
         self.sync_thread.sync_completed.connect(self.handle_sync_completed)  # Process output when done
         self.sync_thread.start()
 
-        self.progress_dialog.exec_()
+        self.progress_dialog.exec()
 
     def update_progress(self):
+        """Update progress bar during scanning process."""
         self.progress_value += 1
         self.progress_bar.setValue(self.progress_value)
 
@@ -185,6 +206,11 @@ class YabridgeController(QMainWindow):
             self.timer.stop()
 
     def handle_sync_completed(self, sync_output):
+        """Handle completion of sync operation and display results.
+        
+        Args:
+            sync_output (str): Output from yabridgectl sync command
+        """
         self.progress_value = 99
 
         # Parse sync output to extract values
@@ -200,7 +226,7 @@ class YabridgeController(QMainWindow):
                                     )
 
         # Add Close button to the progress dialog
-        button_box = QDialogButtonBox(QDialogButtonBox.Close)
+        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         button_box.clicked.connect(self.progress_dialog.close)
         self.progress_dialog.layout().addWidget(button_box)
 
@@ -208,6 +234,7 @@ class YabridgeController(QMainWindow):
         self.load_plugins()
 
     def show_about(self):
+        """Display the About dialog with application information."""
         QMessageBox.about(self, "About", """<h1>Yabridge GUI Controller</h1>
                           <h2>Version 1.0</h2>
                           <p>Facilitates the conversion of Windows VST2/VST3 plugins installed through wine-staging using yabridge. This application <strong>does not manage plugin installation</strong> or removal; those are handled by the plugin installers. It <strong>streamlines the conversion</strong> process to Linux-native VST2/VST3 formats for seamless use with your favorite DAW. Enjoy making music!</p>
@@ -218,7 +245,8 @@ class YabridgeController(QMainWindow):
                           """)
 
 if __name__ == "__main__":
+    """Main entry point for the application."""
     app = QApplication([])
     window = YabridgeController()
     window.show()
-    app.exec_()
+    app.exec()
