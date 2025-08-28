@@ -58,8 +58,8 @@ class YabridgeController(QMainWindow):
         self.vst2_list = QListWidget()
         self.vst3_list = QListWidget()
 
-        scan_button = QPushButton("Scan")
-        scan_button.clicked.connect(self.scan_plugins)
+        self.scan_button = QPushButton("Scan")
+        self.scan_button.clicked.connect(self.scan_plugins)
 
         about_button = QPushButton("About")
         about_button.clicked.connect(self.show_about)
@@ -71,7 +71,7 @@ class YabridgeController(QMainWindow):
         button_layout = QHBoxLayout()
         spacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         button_layout.addItem(spacer)
-        button_layout.addWidget(scan_button)
+        button_layout.addWidget(self.scan_button)
         button_layout.addWidget(about_button)
         button_layout.addWidget(quit_button)
 
@@ -128,6 +128,9 @@ class YabridgeController(QMainWindow):
         else:
             self.wine_status.setText("Wine: Not Installed")
             self.wine_status.setStyleSheet("color: red;")
+        
+        # Disable scan button if either yabridge or wine is not installed
+        self.scan_button.setEnabled(yabridge_installed and wine_installed)
 
     def check_command(self, command, version_flag):
         """Check if a command is available by running it with version flag.
