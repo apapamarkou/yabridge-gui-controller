@@ -53,7 +53,7 @@ This project is licensed under the GNU License. See the [LICENSE](LICENSE) file 
 
 ## Acknowledgments
 
-- **PyQt5**: For providing the graphical interface framework.
+- **PyQt**: For providing the graphical interface framework.
 - **Yabridge**: For managing VST plugins in Wine.
 - **Wine**: For providing the Windows execution environment.
 
