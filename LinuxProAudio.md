@@ -128,7 +128,7 @@ chmod +x winetricks
 - Install service pack 6:
 
 ```sh
-winetricks vcrun6sp6
+./winetricks vcrun6sp6
 ```
 
 - configure wine:
