@@ -24,7 +24,7 @@ sudo pacman -S --needed wine-staging
 sudo zypper install wine-staging wine-staging32bit
 ```
 
-#### 1.c Fedora
+### 1.c Fedora
 
 ```sh
 sudo dnf -y config-manager --add-repo https://dl.winehq.org/wine-builds/fedora/$(rpm -E %fedora)/winehq.repo
@@ -34,7 +34,7 @@ sudo dnf -y config-manager --add-repo https://dl.winehq.org/wine-builds/fedora/$
 sudo dnf -y install winehq-staging
 ```
 
-#### 1.d Ubuntu
+### 1.d Ubuntu
 
 ```sh
 sudo apt -y install wget cabextract
@@ -70,7 +70,7 @@ export WINEFSYNC=1
 
 - Close the terminal
 
-## 2. Install and configure using `winetricks`
+## 2. Configure using `winetricks`
 
 - Download latest `winetricks` script:
 
@@ -132,14 +132,14 @@ yabridgectl set --path="$HOME/.local/share/yabridge"
 #### Debian/Ubuntu and directives (Mint,MX Linux)
 
 ```sh
-sudo apt install python3-pyqt6 git wget
+sudo apt install python3-pyqt6 git wget && wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-install | bash
 
 ```
 
 #### Arch (Manjaro,Garuda,CatchyOS)
 
 ```sh
-sudo pacman -S --needed python-pyqt6 git wget
+sudo pacman -S --needed python-pyqt6 git wget && wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-install | bash
 ```
 
 ## 4. Prepare VST Plugin Folders
