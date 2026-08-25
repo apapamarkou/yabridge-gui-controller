@@ -68,8 +68,6 @@ Add the following lines and then execute them to continue
 export WINEFSYNC=1
 ```
 
-- Close the terminal
-
 ## 2. Configure using `winetricks`
 
 - Download latest `winetricks` script:
@@ -121,7 +119,7 @@ sudo nano .profile
 export PATH="$PATH:$HOME/.local/share/yabridge"
 ```
 
-- Close terminal, reopen it and run.
+- Logoout and log back in. Execute in terminal:
 
 ```sh
 yabridgectl set --path="$HOME/.local/share/yabridge"
@@ -129,7 +127,7 @@ yabridgectl set --path="$HOME/.local/share/yabridge"
 
 ### 4. Install Yabridge GUI
 
-#### Debian/Ubuntu and directives (Mint,MX Linux)
+#### Debian/Ubuntu (Mint,MX Linux etc)
 
 ```sh
 sudo apt install python3-pyqt6 git wget && wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-install | bash
@@ -142,7 +140,7 @@ sudo apt install python3-pyqt6 git wget && wget -qO- https://raw.githubuserconte
 sudo pacman -S --needed python-pyqt6 git wget && wget -qO- https://raw.githubusercontent.com/apapamarkou/yabridge-gui-controller/main/src/yabridge-gui-controller-git-install | bash
 ```
 
-## 4. Prepare VST Plugin Folders
+## 4. Prepare VST Plugin Folders and make them visible to yabridge
 
 ```sh
 mkdir -p "$HOME/.wine/drive_c/Program Files/Steinberg"
