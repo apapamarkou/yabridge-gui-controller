@@ -1,7 +1,6 @@
 # Debian 13 pro-audio setup
 
-Not so hard...
-Open a terminal window
+Open a terminal window (ctrl+alt+T)
 
 ## Install wine-staging
 
@@ -25,9 +24,10 @@ export WINEFSYNC=1
 ```
 
 Run the following to continue without having to logout and login to force system read the paths from `.profile`
-``
+
+```
 export PATH="$PATH:$HOME/.local/share/yabridge:/opt/wine-staging/bin"
-``
+```
 
 ## Install winetricks
 
