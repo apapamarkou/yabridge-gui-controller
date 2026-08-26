@@ -32,7 +32,10 @@ chmod +x winetricks
 winecfg
 ```
 
-## Install yabridge to '$HOME/.local'
+## Install yabridge
+
+download latest release tar.gz , extract and copy the `yabridge` folder to '$HOME/.local/share'
+<https://github.com/robbert-vdh/yabridge/releases>
 
 prepare VST folders
 
