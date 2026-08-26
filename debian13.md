@@ -10,7 +10,11 @@ update your system
 sudo apt -y update && sudo apt -y upgrde
 ```
 
-edit and add to '$HOME/.profile' if not exist:
+edit and add to '~/.profile' if not exist:
+
+```
+nano ~/.profile
+```
 
 Add installation paths for wine and yabridge in your home directory:
 
@@ -137,7 +141,7 @@ sudo ldconfig
 ## Install pipewire patchbay
 
 ```
-sudo apt install qpwgraph
+sudo apt install -y qpwgraph
 ```
 
 ## Enjoy
@@ -146,5 +150,4 @@ reboot
 
 ```
 sudo shutdown -r now
-
 ```
