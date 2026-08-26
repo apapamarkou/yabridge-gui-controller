@@ -148,6 +148,50 @@ sudo apt install -y qpwgraph
 
 reboot
 
+## Install proper wine-staging version
+
 ```
 sudo shutdown -r now
+```
+
+```
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install -y libc6:amd64 libc6:i386 cabextract curl wget libfreetype6:amd64 libfreetype6:i386 \
+    libfontconfig1:amd64 libfontconfig1:i386 libx11-6:amd64 libx11-6:i386 \
+    libxext6:amd64 libxext6:i386 libxrender1:amd64 libxrender1:i386 \
+    libxcursor1:amd64 libxcursor1:i386 libxi6:amd64 libxi6:i386 \
+    libxinerama1:amd64 libxinerama1:i386 libxrandr2:amd64 libxrandr2:i386
+curl -L -o wine-9.21-staging-amd64.tar.xz \
+  https://github.com/Kron4ek/Wine-Builds/releases/download/9.21/wine-9.21-staging-amd64.tar.xz
+mkdir -p "$HOME/.local/share/wine-staging-9.21"
+tar -xJf wine-9.21-staging-amd64.tar.xz \
+  --strip-components=1 \
+  -C "$HOME/.local/share/wine-staging-9.21"
+```
+
+check
+
+```
+wine --version
+```
+
+Make it ddefault for the .exe file execution
+
+```
+mkdir -p "$HOME/.local/share/applications"
+
+cat > "$HOME/.local/share/applications/wine921.desktop" <<EOF
+[Desktop Entry]
+Name=Wine 9.21
+Comment=Run Windows applications with Wine 9.21
+Exec=$HOME/.local/share/wine-staging-9.21/bin/wine %f
+Terminal=false
+Type=Application
+MimeType=application/x-ms-dos-executable;application/x-msdownload;
+NoDisplay=false
+Categories=Utility;
+EOF
+
+update-desktop-database "$HOME/.local/share/applications"
 ```

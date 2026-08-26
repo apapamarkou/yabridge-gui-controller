@@ -64,6 +64,26 @@ check
 wine --version
 ```
 
+Make it ddefault for the .exe file execution
+
+```
+mkdir -p "$HOME/.local/share/applications"
+
+cat > "$HOME/.local/share/applications/wine921.desktop" <<EOF
+[Desktop Entry]
+Name=Wine 9.21
+Comment=Run Windows applications with Wine 9.21
+Exec=$HOME/.local/share/wine-staging-9.21/bin/wine %f
+Terminal=false
+Type=Application
+MimeType=application/x-ms-dos-executable;application/x-msdownload;
+NoDisplay=false
+Categories=Utility;
+EOF
+
+update-desktop-database "$HOME/.local/share/applications"
+```
+
 ## Install winetricks
 
 ```
