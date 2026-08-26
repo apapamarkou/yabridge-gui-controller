@@ -24,6 +24,11 @@ export PATH="$PATH:$HOME/.local/share/yabridge"
 export WINEFSYNC=1
 ```
 
+Run the following to continue without having to logout and login to force system read the paths from `.profile`
+``
+export PATH="$PATH:$HOME/.local/share/yabridge:/opt/wine-staging/bin"
+``
+
 ## Install winetricks
 
 ```
@@ -52,12 +57,16 @@ show them to yabridge
 yabridgectl add "$HOME/.wine/drive_c/Program Files/Steinberg/VstPlugins"
 yabridgectl add "$HOME/.wine/drive_c/Program Files/Common Files/VST3"
 yabridgectl add "$HOME/.wine/drive_c/Program Files/VSTPlugins"
-yabridgectl set --path="~/Applications/yabridge"
+yabridgectl set --path="$HOME/.local/share/yabridge"
 ```
 
 ## Allow audio group users to use
 
 set to `/etc/security/limits.conf` if not set or set to other values before tthe line '# End of file'
+
+``
+sudo nano /etc/security/limits.conf
+``
 
 ```
 @audio           -      rtprio           95
