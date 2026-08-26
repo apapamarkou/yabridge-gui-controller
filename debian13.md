@@ -20,6 +20,7 @@ edit and add to '$HOME/.profile' if not exist:
 
 ```
 export PATH="/opt/wine-staging/bin:$PATH"
+export PATH="$PATH:$HOME/.local/share/yabridge"
 export WINEFSYNC=1
 ```
 
