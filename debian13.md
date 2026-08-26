@@ -2,20 +2,17 @@
 
 Open a terminal window (ctrl+alt+T)
 
-## Install wine-staging
+## Prepare your environment
+
+update your system
 
 ```
-sudo apt -y install wget cabextract
-sudo dpkg --add-architecture i386
-sudo mkdir -pm755 /etc/apt/keyrings
-yes | sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-CODENAME=$(grep -oP 'VERSION="[0-9]+\s+\(\K[^")]+' /etc/os-release)
-yes | sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/$CODENAME/winehq-$CODENAME.sources
-sudo apt update
-sudo apt -y install --install-recommends wine-staging
+sudo apt -y update && sudo apt -y upgrde
 ```
 
 edit and add to '$HOME/.profile' if not exist:
+
+Add installation paths for wine and yabridge in your home directory:
 
 ```
 export PATH="/opt/wine-staging/bin:$PATH"
@@ -29,14 +26,48 @@ Run the following to continue without having to logout and login to force system
 export PATH="$PATH:$HOME/.local/share/yabridge:/opt/wine-staging/bin"
 ```
 
+Some display managers like XFCEs LightDM wont read the `.profile` at startup. You need to point it into `.xsessionrc`
+
+```
+nano ~/.xsessionrc
+```
+
+add these lines
+
+```
+if [ -r "$HOME/.profile" ]; then
+    . "$HOME/.profile"
+fi
+```
+
+## Install wine-staging
+
+```
+sudo apt -y install wget cabextract
+sudo dpkg --add-architecture i386
+sudo mkdir -pm755 /etc/apt/keyrings
+yes | sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+CODENAME=$(grep -oP 'VERSION="[0-9]+\s+\(\K[^")]+' /etc/os-release)
+yes | sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/$CODENAME/winehq-$CODENAME.sources
+sudo apt update
+sudo apt -y install --install-recommends wine-staging
+```
+
 ## Install winetricks
 
 ```
 wget  https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
 chmod +x winetricks
 ./winetricks vcrun6sp6
+```
+
+#### Configure wine
+
+```
 winecfg
 ```
+
+Graphics → Enable Emulate a virtual desktop
 
 ## Install yabridge
 
@@ -78,6 +109,29 @@ sudo nano /etc/security/limits.conf
 
 ```
 sudo usermod -a -G audio $USER
+```
+
+## Complete pipewire installation
+
+Install missing packages
+
+```
+sudo apt install -y pipewire-jack pipewire-audio-client-libraries libspa-0.2-jack
+```
+
+enable and start wireplumber
+
+```
+systemctl --user --now enable wireplumber.service
+```
+
+initialize config
+
+```
+sudo mkdir -p /etc/pipewire/media-session.d
+sudo touch /etc/pipewire/media-session.d/with-jack
+sudo cp /usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-*.conf /etc/ld.so.conf.d/
+sudo ldconfig
 ```
 
 ## Install pipewire patchbay
