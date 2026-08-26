@@ -64,9 +64,9 @@ yabridgectl set --path="$HOME/.local/share/yabridge"
 
 set to `/etc/security/limits.conf` if not set or set to other values before tthe line '# End of file'
 
-``
+```
 sudo nano /etc/security/limits.conf
-``
+```
 
 ```
 @audio           -      rtprio           95
@@ -89,7 +89,8 @@ sudo apt install qpwgraph
 ## Enjoy
 
 reboot
-'''
+
+```
 sudo shutdown -r now
 
 ```
