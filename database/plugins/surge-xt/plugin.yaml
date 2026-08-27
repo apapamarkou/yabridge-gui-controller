@@ -1,0 +1,16 @@
+name: Surge XT
+developer: Surge Synth Team
+description: >
+  Open-source hybrid synthesizer with a massive feature set including wavetable,
+  FM, and subtractive synthesis. Highly regarded in the open-source audio community.
+category: Synthesizer
+website: https://surge-synthesizer.github.io/
+download: https://github.com/surge-synthesizer/surge/releases
+formats:
+  - VST3
+  - CLAP
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true

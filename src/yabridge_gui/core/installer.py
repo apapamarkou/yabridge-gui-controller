@@ -1,0 +1,301 @@
+"""Distribution-specific installer abstractions."""
+
+from __future__ import annotations
+
+import subprocess
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+from yabridge_gui.core.distro import Distribution, detect_distribution
+from yabridge_gui.core.wine import WINE_DIR, WINE_URL, WINE_VERSION
+from yabridge_gui.core.yabridge import YABRIDGE_DIR, YABRIDGE_URL, YABRIDGE_VERSION
+
+
+@dataclass
+class InstallPlan:
+    """Describes what will happen before execution."""
+
+    title: str
+    commands: list[str]  # human-readable descriptions
+    requires_sudo: bool
+    requires_logout: bool = False
+    is_manual: bool = False
+    manual_instructions: str = ""
+
+
+class BaseInstaller(ABC):
+    def __init__(self, distro: Distribution):
+        self.distro = distro
+
+    @abstractmethod
+    def plan_install_wine_deps(self) -> InstallPlan: ...
+
+    @abstractmethod
+    def plan_install_pipewire_jack(self) -> InstallPlan: ...
+
+    @abstractmethod
+    def plan_install_qpwgraph(self) -> InstallPlan: ...
+
+    def plan_install_yabridge(self) -> InstallPlan:
+        return InstallPlan(
+            title="Install yabridge",
+            commands=[
+                f"mkdir -p {YABRIDGE_DIR}",
+                f"curl -L -o /tmp/yabridge-{YABRIDGE_VERSION}.tar.gz {YABRIDGE_URL}",
+                f"tar -xzf /tmp/yabridge-{YABRIDGE_VERSION}.tar.gz -C {YABRIDGE_DIR} --strip-components=1",
+            ],
+            requires_sudo=False,
+        )
+
+    def plan_install_wine_tarball(self) -> InstallPlan:
+        return InstallPlan(
+            title="Install Wine Staging",
+            commands=[
+                f"curl -L -o wine-{WINE_VERSION}-staging-amd64.tar.xz {WINE_URL}",
+                f"mkdir -p {WINE_DIR}",
+                f"tar -xJf wine-{WINE_VERSION}-staging-amd64.tar.xz --strip-components=1 -C {WINE_DIR}",
+            ],
+            requires_sudo=False,
+        )
+
+    def plan_create_vst_dirs(self) -> InstallPlan:
+        from yabridge_gui.core.yabridge import VST_DIRS
+
+        return InstallPlan(
+            title="Create VST directories",
+            commands=[f'mkdir -p "{d}"' for d in VST_DIRS],
+            requires_sudo=False,
+        )
+
+    def plan_configure_yabridge_paths(self) -> InstallPlan:
+        from yabridge_gui.core.yabridge import VST_DIRS
+
+        cmds = [f'yabridgectl add "{d}"' for d in VST_DIRS]
+        cmds.append(f"yabridgectl set --path={YABRIDGE_DIR}")
+        return InstallPlan(title="Configure yabridge paths", commands=cmds, requires_sudo=False)
+
+    def plan_add_audio_group(self) -> InstallPlan:
+        import os
+
+        user = os.getenv("USER") or os.getenv("LOGNAME") or "$USER"
+        return InstallPlan(
+            title="Add user to audio group",
+            commands=[f"sudo usermod -a -G audio {user}"],
+            requires_sudo=True,
+            requires_logout=True,
+            is_manual=False,
+        )
+
+    def plan_configure_rt_limits(self) -> InstallPlan:
+        return InstallPlan(
+            title="Configure realtime limits",
+            commands=["sudo nano /etc/security/limits.conf"],
+            requires_sudo=True,
+            is_manual=True,
+            manual_instructions=(
+                "Add the following lines to /etc/security/limits.conf before '# End of file':\n\n"
+                "@audio           -      rtprio           95\n"
+                "@audio           -      memlock          unlimited\n"
+                "@audio           -      nice             10\n"
+            ),
+        )
+
+    def plan_configure_profile(self) -> InstallPlan:
+        return InstallPlan(
+            title="Configure ~/.profile",
+            commands=["nano ~/.profile"],
+            requires_sudo=False,
+            is_manual=True,
+            manual_instructions=(
+                "Add the following lines to ~/.profile:\n\n"
+                f'export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-{WINE_VERSION}/bin"\n'
+                "export WINEFSYNC=1\n\n"
+                "If using LightDM or similar, also add to ~/.xsessionrc:\n\n"
+                'if [ -r "$HOME/.profile" ]; then\n'
+                '    . "$HOME/.profile"\n'
+                "fi\n"
+            ),
+        )
+
+    def execute_plan(self, plan: InstallPlan) -> tuple[bool, str]:
+        """Execute a non-manual plan. Returns (success, output)."""
+        if plan.is_manual:
+            return False, "Manual action required"
+        output_lines = []
+        for cmd_str in plan.commands:
+            parts = _parse_cmd(cmd_str)
+            try:
+                r = subprocess.run(parts, capture_output=True, text=True, timeout=300)
+                output_lines.append(r.stdout + r.stderr)
+                if r.returncode != 0:
+                    return False, "\n".join(output_lines)
+            except (FileNotFoundError, OSError, subprocess.TimeoutExpired) as e:
+                return False, str(e)
+        return True, "\n".join(output_lines)
+
+
+class AptInstaller(BaseInstaller):
+    """Installer for Debian/Ubuntu."""
+
+    def plan_install_wine_deps(self) -> InstallPlan:
+        if self.distro.id == "ubuntu":
+            libasound = "libasound2t64:amd64 libasound2t64:i386"
+        else:
+            libasound = "libasound2:amd64 libasound2:i386"
+        pkgs = (
+            f"libc6:amd64 libc6:i386 cabextract curl wget "
+            f"libfreetype6:amd64 libfreetype6:i386 "
+            f"libfontconfig1:amd64 libfontconfig1:i386 "
+            f"libx11-6:amd64 libx11-6:i386 "
+            f"libxext6:amd64 libxext6:i386 "
+            f"libxrender1:amd64 libxrender1:i386 "
+            f"libxcursor1:amd64 libxcursor1:i386 "
+            f"libxi6:amd64 libxi6:i386 "
+            f"libxinerama1:amd64 libxinerama1:i386 "
+            f"libxrandr2:amd64 libxrandr2:i386 "
+            f"{libasound} libgl1:amd64 libgl1:i386"
+        )
+        return InstallPlan(
+            title="Install Wine dependencies",
+            commands=[
+                "sudo dpkg --add-architecture i386",
+                "sudo apt update",
+                f"sudo apt install -y {pkgs}",
+            ],
+            requires_sudo=True,
+        )
+
+    def plan_install_pipewire_jack(self) -> InstallPlan:
+        return InstallPlan(
+            title="Install PipeWire JACK packages",
+            commands=[
+                "sudo apt install -y pipewire-jack pipewire-audio-client-libraries libspa-0.2-jack",
+                "systemctl --user --now enable wireplumber.service",
+                "sudo mkdir -p /etc/pipewire/media-session.d",
+                "sudo touch /etc/pipewire/media-session.d/with-jack",
+                "sudo cp /usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-*.conf /etc/ld.so.conf.d/",
+                "sudo ldconfig",
+            ],
+            requires_sudo=True,
+        )
+
+    def plan_install_qpwgraph(self) -> InstallPlan:
+        return InstallPlan(
+            title="Install qpwgraph",
+            commands=["sudo apt install -y qpwgraph"],
+            requires_sudo=True,
+        )
+
+
+class DnfInstaller(BaseInstaller):
+    """Installer for Fedora."""
+
+    def plan_install_wine_deps(self) -> InstallPlan:
+        pkgs = (
+            "glibc.i686 cabextract curl wget freetype freetype.i686 "
+            "fontconfig fontconfig.i686 libX11 libX11.i686 libXext libXext.i686 "
+            "libXrender libXrender.i686 libXcursor libXcursor.i686 "
+            "libXi libXi.i686 libXinerama libXinerama.i686 libXrandr libXrandr.i686"
+        )
+        return InstallPlan(
+            title="Install Wine dependencies",
+            commands=[f"sudo dnf -y install {pkgs}"],
+            requires_sudo=True,
+        )
+
+    def plan_install_pipewire_jack(self) -> InstallPlan:
+        # Fedora ships PipeWire with JACK support by default
+        return InstallPlan(
+            title="PipeWire JACK (Fedora)",
+            commands=[],
+            requires_sudo=False,
+            is_manual=True,
+            manual_instructions="Fedora 44 ships PipeWire with JACK support by default. No additional packages needed.",
+        )
+
+    def plan_install_qpwgraph(self) -> InstallPlan:
+        return InstallPlan(
+            title="Install qpwgraph",
+            commands=["sudo dnf install -y qpwgraph"],
+            requires_sudo=True,
+        )
+
+
+class PacmanInstaller(BaseInstaller):
+    """Installer for Arch Linux."""
+
+    def plan_install_wine_deps(self) -> InstallPlan:
+        pkgs = (
+            "glibc lib32-glibc cabextract curl wget freetype2 lib32-freetype2 "
+            "fontconfig lib32-fontconfig libx11 lib32-libx11 libxext lib32-libxext "
+            "libxrender lib32-libxrender libxcursor lib32-libxcursor libxi lib32-libxi "
+            "libxinerama lib32-libxinerama libxrandr lib32-libxrandr "
+            "alsa-lib lib32-alsa-lib mesa lib32-mesa libpulse lib32-libpulse"
+        )
+        return InstallPlan(
+            title="Install Wine dependencies",
+            commands=[
+                "sudo pacman -S --needed multilib-devel",
+                f"sudo pacman -S --needed {pkgs}",
+            ],
+            requires_sudo=True,
+        )
+
+    def plan_install_pipewire_jack(self) -> InstallPlan:
+        return InstallPlan(
+            title="PipeWire JACK (Arch)",
+            commands=[],
+            requires_sudo=False,
+            is_manual=True,
+            manual_instructions="Arch Linux ships PipeWire with JACK support. Ensure pipewire-jack is installed.",
+        )
+
+    def plan_install_qpwgraph(self) -> InstallPlan:
+        return InstallPlan(
+            title="Install qpwgraph",
+            commands=["sudo pacman -S --needed qpwgraph"],
+            requires_sudo=True,
+        )
+
+
+class UnsupportedInstaller(BaseInstaller):
+    """Fallback for unsupported distributions."""
+
+    def _manual(self, title: str) -> InstallPlan:
+        return InstallPlan(
+            title=title,
+            commands=[],
+            requires_sudo=False,
+            is_manual=True,
+            manual_instructions="See others.md for manual setup instructions.",
+        )
+
+    def plan_install_wine_deps(self) -> InstallPlan:
+        return self._manual("Install Wine dependencies")
+
+    def plan_install_pipewire_jack(self) -> InstallPlan:
+        return self._manual("Install PipeWire JACK")
+
+    def plan_install_qpwgraph(self) -> InstallPlan:
+        return self._manual("Install qpwgraph")
+
+
+def get_installer(distro: Distribution | None = None) -> BaseInstaller:
+    if distro is None:
+        distro = detect_distribution()
+    match distro.family:
+        case "debian":
+            return AptInstaller(distro)
+        case "fedora":
+            return DnfInstaller(distro)
+        case "arch":
+            return PacmanInstaller(distro)
+        case _:
+            return UnsupportedInstaller(distro)
+
+
+def _parse_cmd(cmd_str: str) -> list[str]:
+    """Split a command string into a list, handling simple quoted args."""
+    import shlex
+
+    return shlex.split(cmd_str)

@@ -1,0 +1,15 @@
+name: Vital
+developer: Matt Tytel
+description: >
+  Spectral warping wavetable synthesizer with a polished interface and
+  powerful modulation system. Free tier available with full functionality.
+category: Synthesizer
+website: https://vital.audio/
+download: https://vital.audio/#download
+formats:
+  - VST3
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true

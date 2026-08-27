@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-# __     __   _          _     _               _____ _    _ _____ 
+# __     __   _          _     _               _____ _    _ _____
 # \ \   / /  | |        (_)   | |             / ____| |  | |_   _|
-#  \ \_/ /_ _| |__  _ __ _  __| | __ _  ___  | |  __| |  | | | |  
-#   \   / _` | '_ \| '__| |/ _` |/ _` |/ _ \ | | |_ | |  | | | |  
-#    | | (_| | |_) | |  | | (_| | (_| |  __/ | |__| | |__| |_| |_ 
+#  \ \_/ /_ _| |__  _ __ _  __| | __ _  ___  | |  __| |  | | | |
+#   \   / _` | '_ \| '__| |/ _` |/ _` |/ _ \ | | |_ | |  | | | |
+#    | | (_| | |_) | |  | | (_| | (_| |  __/ | |__| | |__| |_| |_
 #    |_|\__,_|_.__/|_|  |_|\__,_|\__, |\___|  \_____|\____/|_____|
-#                                 __/ |                           
-#                                |___/  
+#                                 __/ |
+#                                |___/
 #
 # A yabridge GUI controller
 #
@@ -17,13 +17,27 @@
 #
 
 import os
-import subprocess
 import re
-from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QListWidget, QVBoxLayout,
-                             QLabel, QHBoxLayout, QPushButton, QWidget, QMessageBox,
-                             QSpacerItem, QSizePolicy, QProgressBar, QDialog,
-                             QDialogButtonBox)
+import subprocess
+
+from PyQt6.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QDialogButtonBox,
+    QHBoxLayout,
+    QLabel,
+    QListWidget,
+    QMainWindow,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QSizePolicy,
+    QSpacerItem,
+    QVBoxLayout,
+    QWidget,
+)
+
 
 class SyncThread(QThread):
     """Background thread for running yabridgectl sync command."""
@@ -38,7 +52,7 @@ class SyncThread(QThread):
 
 class YabridgeController(QMainWindow):
     """Main application window for Yabridge GUI Controller."""
-    
+
     def __init__(self):
         """Initialize the main window and set up the application."""
         super().__init__()
@@ -128,7 +142,7 @@ class YabridgeController(QMainWindow):
         else:
             self.wine_status.setText("Wine: Not Installed")
             self.wine_status.setStyleSheet("color: red;")
-        
+
         # Disable scan button if either yabridge or wine is not installed
         self.scan_button.setEnabled(yabridge_installed and wine_installed)
 
