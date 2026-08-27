@@ -1,4 +1,4 @@
-# AntiX 26 pro-audio setup
+# Debian 13 pro-audio setup
 
 Open a terminal window (ctrl+alt+T)
 
@@ -16,21 +16,11 @@ edit and add to '~/.profile' if not exist:
 nano ~/.profile
 ```
 
-Add installation paths for wine and yabridge:
+Add installation paths for wine and yabridge in your home directory:
 
 ```
 export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-9.21/bin"
 export WINEFSYNC=1
-```
-
-also add the above lines to icewm and bash
-
-```
-nano ~/.icewm/env
-```
-
-```
-nano ~/.bashrc
 ```
 
 Run the following to continue without having to logout and login to force system read the paths from `.profile`
@@ -58,12 +48,20 @@ fi
 ```
 sudo dpkg --add-architecture i386
 sudo apt update
-sudo apt install -y libc6:amd64 libc6:i386 cabextract curl wget libfreetype6:amd64 libfreetype6:i386 \
-    libfontconfig1:amd64 libfontconfig1:i386 libx11-6:amd64 libx11-6:i386 \
-    libxext6:amd64 libxext6:i386 libxrender1:amd64 libxrender1:i386 \
-    libxcursor1:amd64 libxcursor1:i386 libxi6:amd64 libxi6:i386 \
-    libxinerama1:amd64 libxinerama1:i386 libxrandr2:amd64 libxrandr2:i386 \
-    libasound2:amd64 libasound2:i386 libgl1:amd64 libgl1:i386
+sudo apt install -y \
+  libc6:amd64 libc6:i386 \
+  cabextract curl wget \
+  libfreetype6:amd64 libfreetype6:i386 \
+  libfontconfig1:amd64 libfontconfig1:i386 \
+  libx11-6:amd64 libx11-6:i386 \
+  libxext6:amd64 libxext6:i386 \
+  libxrender1:amd64 libxrender1:i386 \
+  libxcursor1:amd64 libxcursor1:i386 \
+  libxi6:amd64 libxi6:i386 \
+  libxinerama1:amd64 libxinerama1:i386 \
+  libxrandr2:amd64 libxrandr2:i386 \
+  libasound2t64:amd64 libasound2t64:i386 \
+  libgl1:amd64 libgl1:i386
 curl -L -o wine-9.21-staging-amd64.tar.xz \
   https://github.com/Kron4ek/Wine-Builds/releases/download/9.21/wine-9.21-staging-amd64.tar.xz
 mkdir -p "$HOME/.local/share/wine-staging-9.21"
@@ -167,6 +165,12 @@ Install missing packages
 
 ```
 sudo apt install -y pipewire-jack pipewire-audio-client-libraries libspa-0.2-jack
+```
+
+enable and start wireplumber
+
+```
+systemctl --user --now enable wireplumber.service
 ```
 
 initialize config
