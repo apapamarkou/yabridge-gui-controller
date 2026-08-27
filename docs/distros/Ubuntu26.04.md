@@ -1,4 +1,4 @@
-# Debian 13 pro-audio setup
+# Ubuntu 26.04 pro-audio setup
 
 Open a terminal window (ctrl+alt+T)
 
