@@ -39,17 +39,9 @@ install:
 	@mkdir -p "$(HOME)/.local/share/applications"
 	@mkdir -p "$(HOME)/.local/share/icons"
 	@cp src/yabridge-gui-controller.png "$(HOME)/.local/share/icons/$(PKG_NAME).png" 2>/dev/null || true
-	@cat > "$(HOME)/.local/share/applications/$(PKG_NAME).desktop" <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=Yabridge GUI Controller
-Comment=Manage Windows VST/VST3 plugins via yabridge
-Exec=$(PKG_NAME)
-Icon=$(HOME)/.local/share/icons/$(PKG_NAME).png
-Terminal=false
-Categories=AudioVideo;Audio;Settings;
-StartupNotify=true
-EOF
+	@printf '[Desktop Entry]\nType=Application\nName=Yabridge GUI Controller\nComment=Manage Windows VST/VST3 plugins via yabridge\nExec=%s\nIcon=%s/.local/share/icons/%s.png\nTerminal=false\nCategories=AudioVideo;Audio;Settings;\nStartupNotify=true\n' \
+		"$(PKG_NAME)" "$(HOME)" "$(PKG_NAME)" \
+		> "$(HOME)/.local/share/applications/$(PKG_NAME).desktop"
 	@echo "Installed. Run: $(PKG_NAME)"
 
 ## Uninstall the locally installed application
