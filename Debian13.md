@@ -1,4 +1,4 @@
-# Fedora 44 pro-audio setup
+# Debian 13 pro-audio setup
 
 Open a terminal window (ctrl+alt+T)
 
@@ -7,7 +7,7 @@ Open a terminal window (ctrl+alt+T)
 update your system
 
 ```
-sudo dnf -y update
+sudo apt -y update && sudo apt -y upgrade
 ```
 
 edit and add to '~/.profile' if not exist:
@@ -29,7 +29,7 @@ Run the following to continue without having to logout and login to force system
 export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-9.21/bin"
 ```
 
-Some display managers like XFCEs LightDM wont read the `.profile` at startup. You need to point it into `.xsessionrc`
+Some display managers like XFCEs LightDM wont call the `.profile` at startup. You need to call it from `.xsessionrc`
 
 ```
 nano ~/.xsessionrc
@@ -43,13 +43,17 @@ if [ -r "$HOME/.profile" ]; then
 fi
 ```
 
-## Install proper wine-staging version
+## Install wine-staging
 
 ```
-sudo dnf -y install glibc.i686 cabextract curl wget freetype freetype.i686 fontconfig fontconfig.i686 \
-    libX11 libX11.i686 libXext libXext.i686 libXrender libXrender.i686 \
-    libXcursor libXcursor.i686 libXi libXi.i686 libXinerama libXinerama.i686 \
-    libXrandr libXrandr.i686
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install -y libc6:amd64 libc6:i386 cabextract curl wget libfreetype6:amd64 libfreetype6:i386 \
+    libfontconfig1:amd64 libfontconfig1:i386 libx11-6:amd64 libx11-6:i386 \
+    libxext6:amd64 libxext6:i386 libxrender1:amd64 libxrender1:i386 \
+    libxcursor1:amd64 libxcursor1:i386 libxi6:amd64 libxi6:i386 \
+    libxinerama1:amd64 libxinerama1:i386 libxrandr2:amd64 libxrandr2:i386 \
+    libasound2:amd64 libasound2:i386 libgl1:amd64 libgl1:i386
 curl -L -o wine-9.21-staging-amd64.tar.xz \
   https://github.com/Kron4ek/Wine-Builds/releases/download/9.21/wine-9.21-staging-amd64.tar.xz
 mkdir -p "$HOME/.local/share/wine-staging-9.21"
@@ -64,7 +68,7 @@ check
 wine --version
 ```
 
-Make it ddefault for the .exe file execution
+Make it default for the .exe file execution
 
 ```
 mkdir -p "$HOME/.local/share/applications"
@@ -92,7 +96,7 @@ chmod +x winetricks
 ./winetricks vcrun6sp6
 ```
 
-to configure wine
+#### Configure wine
 
 ```
 winecfg
@@ -127,12 +131,6 @@ yabridgectl add "$HOME/.wine/drive_c/Program Files/VSTPlugins"
 yabridgectl set --path="$HOME/.local/share/yabridge"
 ```
 
-check if it works
-
-```
-yabridgectl sync
-```
-
 ## Allow audio group users to use
 
 set to `/etc/security/limits.conf` if not set or set to other values before tthe line '# End of file'
@@ -153,10 +151,33 @@ sudo nano /etc/security/limits.conf
 sudo usermod -a -G audio $USER
 ```
 
+## Complete pipewire installation
+
+Install missing packages
+
+```
+sudo apt install -y pipewire-jack pipewire-audio-client-libraries libspa-0.2-jack
+```
+
+enable and start wireplumber
+
+```
+systemctl --user --now enable wireplumber.service
+```
+
+initialize config
+
+```
+sudo mkdir -p /etc/pipewire/media-session.d
+sudo touch /etc/pipewire/media-session.d/with-jack
+sudo cp /usr/share/doc/pipewire/examples/ld.so.conf.d/pipewire-jack-*.conf /etc/ld.so.conf.d/
+sudo ldconfig
+```
+
 ## Install pipewire patchbay
 
 ```
-sudo dnf install -y qpwgraph
+sudo apt install -y qpwgraph
 ```
 
 ## Enjoy
