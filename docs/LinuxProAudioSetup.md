@@ -23,7 +23,7 @@ The instructions are about to
 
 Click on the links to get the instructions:
 
-- Ubuntu 26.04
-- Debian 13
-- Fedora 44
-- Arch
+- [Ubuntu 26.04](https://github.com/apapamarkou/yabridge-gui-controller/blob/main/docs/distros/Ubuntu26.04.md)
+- [Debian 13](https://github.com/apapamarkou/yabridge-gui-controller/blob/main/docs/distros/Debian13.md)
+- [Fedora 44](https://github.com/apapamarkou/yabridge-gui-controller/blob/main/docs/distros/Fedora44.md)
+- [Arch](https://github.com/apapamarkou/yabridge-gui-controller/blob/main/docs/distros/Arch.md)
