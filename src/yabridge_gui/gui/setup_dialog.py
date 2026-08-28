@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
@@ -32,6 +32,43 @@ _STATUS_ICONS = {
     CheckStatus.UNKNOWN: ("?", "color: gray;"),
     CheckStatus.UNSUPPORTED: ("—", "color: gray;"),
 }
+
+
+_SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+
+class _SpinnerDialog(QDialog):
+    def __init__(self, title: str, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setFixedSize(300, 90)
+        self.setWindowFlags(
+            Qt.WindowType.Dialog
+            | Qt.WindowType.CustomizeWindowHint
+            | Qt.WindowType.WindowTitleHint
+        )
+        self._frame = 0
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._lbl = QLabel()
+        self._lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._lbl.setStyleSheet("font-size: 22px;")
+        layout.addWidget(self._lbl)
+        msg = QLabel("Running, please wait\u2026")
+        msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(msg)
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._tick)
+        self._timer.start(80)
+        self._tick()
+
+    def _tick(self) -> None:
+        self._lbl.setText(_SPINNER_FRAMES[self._frame % len(_SPINNER_FRAMES)])
+        self._frame += 1
+
+    def stop(self) -> None:
+        self._timer.stop()
+        self.accept()
 
 
 class _WorkerThread(QThread):
@@ -199,11 +236,14 @@ class SetupDialog(QDialog):
         if msg.exec() != QMessageBox.StandardButton.Ok:
             return
 
+        self._spinner = _SpinnerDialog(plan.title, self)
         self._worker = _WorkerThread(plan)
-        self._worker.finished.connect(lambda ok, out: self._fix_done(ok, out, plan.title))
+        self._worker.finished.connect(lambda ok, out: self._on_worker_done(ok, out, plan.title))
         self._worker.start()
+        self._spinner.exec()
 
-    def _fix_done(self, ok: bool, output: str, title: str) -> None:
+    def _on_worker_done(self, ok: bool, output: str, title: str) -> None:
+        self._spinner.stop()
         self._show_output_dialog(ok, title, output)
         self._refresh()
 
