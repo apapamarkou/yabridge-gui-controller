@@ -75,7 +75,7 @@ def check_wine_configured() -> EnvironmentCheck:
         "Wine configured",
         CheckStatus.WARNING,
         "Wine prefix not initialised — run winetricks + winecfg",
-        fix_available=False,
+        fix_available=True,
         fix_key="configure_wine",
     )
 

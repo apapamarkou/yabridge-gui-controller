@@ -16,11 +16,52 @@ class InstallPlan:
     """Describes what will happen before execution."""
 
     title: str
-    commands: list[str]  # human-readable descriptions
+    commands: list[str]  # executable command strings
     requires_sudo: bool
     requires_logout: bool = False
     is_manual: bool = False
     manual_instructions: str = ""
+    # Commands shown in the clipboard button — only the raw shell commands,
+    # no prose or comment lines. Auto-derived from manual_instructions if empty.
+    copyable_commands: list[str] = None  # type: ignore[assignment]
+
+    def __post_init__(self) -> None:
+        if self.copyable_commands is None:
+            self.copyable_commands = _extract_commands(self.manual_instructions)
+
+
+def _extract_commands(text: str) -> list[str]:
+    """Return only executable lines from instruction text (skip comments/prose)."""
+    cmds = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if (
+            stripped
+            and not stripped.startswith("#")
+            and not stripped[0].isalpha()
+            or stripped.startswith(
+                (
+                    "sudo ",
+                    "wget ",
+                    "curl ",
+                    "tar ",
+                    "mkdir ",
+                    "chmod ",
+                    "cat ",
+                    "cp ",
+                    "rm ",
+                    "systemctl ",
+                    "update-",
+                    "./",
+                    "export ",
+                    "nano ",
+                    "winecfg",
+                    "./winetricks",
+                )
+            )
+        ):
+            cmds.append(stripped)
+    return cmds
 
 
 class BaseInstaller(ABC):
@@ -117,20 +158,18 @@ class BaseInstaller(ABC):
         )
 
     def plan_configure_wine(self) -> InstallPlan:
+        winetricks_url = (
+            "https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks"
+        )
         return InstallPlan(
             title="Configure Wine (winetricks + winecfg)",
-            commands=[],
+            commands=[
+                f"wget -O /tmp/winetricks {winetricks_url}",
+                "chmod +x /tmp/winetricks",
+                "/tmp/winetricks vcrun6sp6",
+                "winecfg",
+            ],
             requires_sudo=False,
-            is_manual=True,
-            manual_instructions=(
-                "Run the following commands in a terminal:\n\n"
-                "# Download and run winetricks\n"
-                "wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks\n"
-                "chmod +x winetricks\n"
-                "./winetricks vcrun6sp6\n\n"
-                "# Configure Wine\n"
-                "winecfg\n"
-            ),
         )
 
     def plan_configure_rt_limits(self) -> InstallPlan:
@@ -177,7 +216,14 @@ class BaseInstaller(ABC):
             return False, "Manual action required"
         output_lines = []
         for cmd_str in plan.commands:
-            parts = _parse_cmd(cmd_str)
+            # Multi-line commands (e.g. desktop entry heredoc) run via bash -c
+            if "\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|")):
+                parts = ["bash", "-c", cmd_str]
+            else:
+                parts = _parse_cmd(cmd_str)
+                # Wrap sudo commands with pkexec for GUI password prompt
+                if parts and parts[0] == "sudo":
+                    parts = ["pkexec"] + parts[1:]
             try:
                 r = subprocess.run(parts, capture_output=True, text=True, timeout=300)
                 output_lines.append(r.stdout + r.stderr)

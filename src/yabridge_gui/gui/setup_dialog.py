@@ -191,11 +191,29 @@ class SetupDialog(QDialog):
         self._worker.start()
 
     def _fix_done(self, ok: bool, output: str, title: str) -> None:
-        if ok:
-            QMessageBox.information(self, title, f"Completed successfully.\n\n{output[:500]}")
-        else:
-            QMessageBox.critical(self, f"Failed: {title}", f"Operation failed.\n\n{output[:1000]}")
+        self._show_output_dialog(ok, title, output)
         self._refresh()
+
+    def _show_output_dialog(self, ok: bool, title: str, output: str) -> None:
+        dlg = QDialog(self)
+        dlg.setWindowTitle(f"{'Completed' if ok else 'Failed'}: {title}")
+        dlg.setMinimumSize(600, 400)
+        layout = QVBoxLayout(dlg)
+        status_lbl = QLabel(
+            "<b style='color:green'>Completed successfully.</b>"
+            if ok
+            else "<b style='color:red'>Operation failed.</b>"
+        )
+        layout.addWidget(status_lbl)
+        text = QTextEdit()
+        text.setReadOnly(True)
+        text.setFontFamily("monospace")
+        text.setPlainText(output or "(no output)")
+        layout.addWidget(text)
+        btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        btn.rejected.connect(dlg.reject)
+        layout.addWidget(btn)
+        dlg.exec()
 
     def _show_manual_instructions(self, check: EnvironmentCheck) -> None:
         plan = self._get_plan_for(check.fix_key)
@@ -216,8 +234,9 @@ class SetupDialog(QDialog):
         text.setPlainText(plan.manual_instructions)
         layout.addWidget(text)
         btn_row = QHBoxLayout()
-        copy_btn = QPushButton("Copy to Clipboard")
-        copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(plan.manual_instructions))
+        copy_btn = QPushButton("Copy Commands")
+        clipboard_text = "\n".join(plan.copyable_commands)
+        copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(clipboard_text))
         close_btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         close_btn.rejected.connect(dlg.reject)
         btn_row.addWidget(copy_btn)
