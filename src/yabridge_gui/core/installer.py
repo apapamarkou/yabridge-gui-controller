@@ -140,13 +140,15 @@ class BaseInstaller(ABC):
         )
 
     def plan_configure_yabridge_paths(self) -> InstallPlan:
+        home = Path.home()
         vst_dirs = [
-            "$HOME/.wine/drive_c/Program Files/Steinberg/VstPlugins",
-            "$HOME/.wine/drive_c/Program Files/Common Files/VST3",
-            "$HOME/.wine/drive_c/Program Files/VSTPlugins",
+            home / ".wine/drive_c/Program Files/Steinberg/VstPlugins",
+            home / ".wine/drive_c/Program Files/Common Files/VST3",
+            home / ".wine/drive_c/Program Files/VSTPlugins",
         ]
+        yabridge_dir = home / ".local/share/yabridge"
         cmds = [f'yabridgectl add "{d}"' for d in vst_dirs]
-        cmds.append('yabridgectl set --path="$HOME/.local/share/yabridge"')
+        cmds.append(f'yabridgectl set --path="{yabridge_dir}"')
         return InstallPlan(title="Configure yabridge paths", commands=cmds, requires_sudo=False)
 
     def plan_add_audio_group(self) -> InstallPlan:
