@@ -139,7 +139,6 @@ def check_audio_group() -> EnvironmentCheck:
             f"User '{username}' not in audio group",
             fix_available=True,
             fix_key="add_audio_group",
-            logout_warning="Logout or restart required after being added to the audio group.",
         )
     except KeyError:
         return EnvironmentCheck(
