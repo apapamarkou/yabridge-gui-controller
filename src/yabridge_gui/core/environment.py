@@ -26,6 +26,7 @@ class EnvironmentCheck:
     detail: str = ""
     fix_available: bool = False
     fix_key: str = ""
+    logout_warning: str = ""
 
 
 def _run(cmd: list[str]) -> tuple[bool, str]:
@@ -121,6 +122,18 @@ def check_audio_group() -> EnvironmentCheck:
     try:
         audio_group = grp.getgrnam("audio")
         if username in audio_group.gr_mem:
+            # Check if the group is active in the current session
+            import subprocess
+            result = subprocess.run(["id", "-Gn"], capture_output=True, text=True)
+            active_groups = result.stdout.split()
+            if "audio" not in active_groups:
+                return EnvironmentCheck(
+                    "audio_group",
+                    "Audio group",
+                    CheckStatus.WARNING,
+                    f"User '{username}' in audio group but session not updated",
+                    logout_warning="Logout or restart required for audio group membership to take effect.",
+                )
             return EnvironmentCheck(
                 "audio_group", "Audio group", CheckStatus.OK, f"User '{username}' in audio group"
             )
@@ -131,6 +144,7 @@ def check_audio_group() -> EnvironmentCheck:
             f"User '{username}' not in audio group",
             fix_available=False,
             fix_key="add_audio_group",
+            logout_warning="Logout or restart required after being added to the audio group.",
         )
     except KeyError:
         return EnvironmentCheck(
@@ -236,26 +250,52 @@ def check_yabridge_paths() -> EnvironmentCheck:
     )
 
 
+def _path_in_env(fragment: str) -> bool:
+    """Return True if fragment appears in the current $PATH."""
+    return fragment in os.environ.get("PATH", "")
+
+
 def check_profile_paths() -> EnvironmentCheck:
     profile = Path.home() / ".profile"
-    if not profile.exists():
-        return EnvironmentCheck(
-            "profile_paths", "PATH (yabridge/wine)", CheckStatus.WARNING, "~/.profile not found"
-        )
-    content = profile.read_text()
-    has_yabridge = ".local/share/yabridge" in content
-    has_wine = "wine-staging" in content
-    has_winefsync = "WINEFSYNC" in content
-    if has_yabridge and has_wine and has_winefsync:
+    xsession = Path.home() / ".xsessionrc"
+
+    def _file_has(path: Path, *fragments: str) -> bool:
+        if not path.exists():
+            return False
+        content = path.read_text()
+        return all(f in content for f in fragments)
+
+    in_files_yabridge = _file_has(profile, ".local/share/yabridge") or _file_has(
+        xsession, ".local/share/yabridge"
+    )
+    in_files_wine = _file_has(profile, "wine-staging") or _file_has(xsession, "wine-staging")
+    in_files_winefsync = _file_has(profile, "WINEFSYNC") or _file_has(xsession, "WINEFSYNC")
+    all_in_files = in_files_yabridge and in_files_wine and in_files_winefsync
+
+    in_path_yabridge = _path_in_env(".local/share/yabridge")
+    in_path_wine = _path_in_env("wine-staging")
+    all_in_path = in_path_yabridge and in_path_wine
+
+    if all_in_files and all_in_path:
         return EnvironmentCheck(
             "profile_paths", "PATH (yabridge/wine)", CheckStatus.OK, "~/.profile configured"
         )
+
+    if all_in_files and not all_in_path:
+        return EnvironmentCheck(
+            "profile_paths",
+            "PATH (yabridge/wine)",
+            CheckStatus.WARNING,
+            "Paths configured in ~/.profile / ~/.xsessionrc but not active in current session",
+            logout_warning="Logout or restart required for PATH changes to take effect.",
+        )
+
     missing = []
-    if not has_yabridge:
+    if not in_files_yabridge:
         missing.append("yabridge path")
-    if not has_wine:
+    if not in_files_wine:
         missing.append("wine-staging path")
-    if not has_winefsync:
+    if not in_files_winefsync:
         missing.append("WINEFSYNC=1")
     return EnvironmentCheck(
         "profile_paths",
@@ -273,11 +313,11 @@ def run_environment_checks() -> list[EnvironmentCheck]:
         check_wine_configured(),
         check_yabridge_binary(),
         check_yabridge(),
-        check_vst_dirs(),
-        check_yabridge_paths(),
         check_profile_paths(),
         check_audio_group(),
         check_realtime_limits(),
+        check_vst_dirs(),
+        check_yabridge_paths(),
         check_pipewire(),
         check_wireplumber(),
     ]

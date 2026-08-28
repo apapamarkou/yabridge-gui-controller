@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -53,7 +54,8 @@ def test_check_profile_paths_ok(tmp_path):
         'export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-9.21/bin"\n'
         "export WINEFSYNC=1\n"
     )
-    with patch.object(Path, "home", return_value=tmp_path):
+    fake_path = "/usr/bin:" + str(tmp_path) + "/.local/share/yabridge:" + str(tmp_path) + "/.local/share/wine-staging-9.21/bin"
+    with patch.object(Path, "home", return_value=tmp_path), patch.dict(os.environ, {"PATH": fake_path}):
         result = check_profile_paths()
     assert result.status == CheckStatus.OK
 

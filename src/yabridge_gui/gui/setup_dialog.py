@@ -117,6 +117,11 @@ class SetupDialog(QDialog):
             self._checks_layout.addWidget(self._make_check_row(check))
 
     def _make_check_row(self, check: EnvironmentCheck) -> QWidget:
+        wrapper = QWidget()
+        v = QVBoxLayout(wrapper)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(0)
+
         row = QWidget()
         h = QHBoxLayout(row)
         h.setContentsMargins(4, 2, 4, 2)
@@ -155,7 +160,15 @@ class SetupDialog(QDialog):
                 instr_btn.clicked.connect(lambda _, c=check: self._show_manual_instructions(c))
                 h.addWidget(instr_btn)
 
-        return row
+        v.addWidget(row)
+
+        if check.logout_warning:
+            warn_lbl = QLabel(f"  ⟳ {check.logout_warning}")
+            warn_lbl.setStyleSheet("color: orange; font-size: 11px; padding-left: 24px;")
+            warn_lbl.setWordWrap(True)
+            v.addWidget(warn_lbl)
+
+        return wrapper
 
     def _attempt_fix(self, check: EnvironmentCheck) -> None:
         plan = self._get_plan_for(check.fix_key)
