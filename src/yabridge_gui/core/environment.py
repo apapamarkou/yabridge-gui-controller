@@ -61,6 +61,25 @@ def check_wine() -> EnvironmentCheck:
     )
 
 
+def check_wine_configured() -> EnvironmentCheck:
+    """Check whether winetricks and winecfg have been run (Wine prefix exists)."""
+    wineprefix = Path.home() / ".wine"
+    system32 = wineprefix / "drive_c/windows/system32"
+    # A configured Wine prefix always has drive_c/windows/system32
+    if system32.exists():
+        return EnvironmentCheck(
+            "wine_configured", "Wine configured", CheckStatus.OK, "Wine prefix found"
+        )
+    return EnvironmentCheck(
+        "wine_configured",
+        "Wine configured",
+        CheckStatus.WARNING,
+        "Wine prefix not initialised — run winetricks + winecfg",
+        fix_available=False,
+        fix_key="configure_wine",
+    )
+
+
 def check_yabridge() -> EnvironmentCheck:
     ok, ver = _command_version("yabridgectl")
     if ok:
@@ -251,6 +270,7 @@ def check_profile_paths() -> EnvironmentCheck:
 def run_environment_checks() -> list[EnvironmentCheck]:
     return [
         check_wine(),
+        check_wine_configured(),
         check_yabridge_binary(),
         check_yabridge(),
         check_vst_dirs(),

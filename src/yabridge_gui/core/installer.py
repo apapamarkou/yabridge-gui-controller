@@ -47,13 +47,39 @@ class BaseInstaller(ABC):
             requires_sudo=False,
         )
 
+    def plan_install_wine_full(self) -> InstallPlan:
+        """Full wine-staging install: deps + tarball download + desktop entry."""
+        deps_plan = self.plan_install_wine_deps()
+        tarball_plan = self.plan_install_wine_tarball()
+        return InstallPlan(
+            title="Install Wine Staging (full)",
+            commands=deps_plan.commands + tarball_plan.commands,
+            requires_sudo=deps_plan.requires_sudo,
+        )
+
     def plan_install_wine_tarball(self) -> InstallPlan:
+        desktop_entry = (
+            f'mkdir -p "$HOME/.local/share/applications"\n'
+            f"cat > \"$HOME/.local/share/applications/wine921.desktop\" <<'EOF'\n"
+            f"[Desktop Entry]\n"
+            f"Name=Wine 9.21\n"
+            f"Comment=Run Windows applications with Wine 9.21\n"
+            f"Exec=$HOME/.local/share/wine-staging-{WINE_VERSION}/bin/wine %f\n"
+            f"Terminal=false\n"
+            f"Type=Application\n"
+            f"MimeType=application/x-ms-dos-executable;application/x-msdownload;\n"
+            f"NoDisplay=false\n"
+            f"Categories=Utility;\n"
+            f"EOF\n"
+            f'update-desktop-database "$HOME/.local/share/applications"'
+        )
         return InstallPlan(
             title="Install Wine Staging",
             commands=[
                 f"curl -L -o wine-{WINE_VERSION}-staging-amd64.tar.xz {WINE_URL}",
                 f"mkdir -p {WINE_DIR}",
                 f"tar -xJf wine-{WINE_VERSION}-staging-amd64.tar.xz --strip-components=1 -C {WINE_DIR}",
+                desktop_entry,
             ],
             requires_sudo=False,
         )
@@ -83,17 +109,40 @@ class BaseInstaller(ABC):
             commands=[f"sudo usermod -a -G audio {user}"],
             requires_sudo=True,
             requires_logout=True,
-            is_manual=False,
+            is_manual=True,
+            manual_instructions=(
+                f"Run the following command in a terminal, then log out and back in:\n\n"
+                f"sudo usermod -a -G audio {user}\n"
+            ),
+        )
+
+    def plan_configure_wine(self) -> InstallPlan:
+        return InstallPlan(
+            title="Configure Wine (winetricks + winecfg)",
+            commands=[],
+            requires_sudo=False,
+            is_manual=True,
+            manual_instructions=(
+                "Run the following commands in a terminal:\n\n"
+                "# Download and run winetricks\n"
+                "wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks\n"
+                "chmod +x winetricks\n"
+                "./winetricks vcrun6sp6\n\n"
+                "# Configure Wine\n"
+                "winecfg\n"
+            ),
         )
 
     def plan_configure_rt_limits(self) -> InstallPlan:
         return InstallPlan(
             title="Configure realtime limits",
-            commands=["sudo nano /etc/security/limits.conf"],
+            commands=[],
             requires_sudo=True,
             is_manual=True,
             manual_instructions=(
-                "Add the following lines to /etc/security/limits.conf before '# End of file':\n\n"
+                "Open the file in a terminal:\n\n"
+                "sudo nano /etc/security/limits.conf\n\n"
+                "Add the following lines before '# End of file':\n\n"
                 "@audio           -      rtprio           95\n"
                 "@audio           -      memlock          unlimited\n"
                 "@audio           -      nice             10\n"
@@ -103,14 +152,19 @@ class BaseInstaller(ABC):
     def plan_configure_profile(self) -> InstallPlan:
         return InstallPlan(
             title="Configure ~/.profile",
-            commands=["nano ~/.profile"],
+            commands=[],
             requires_sudo=False,
             is_manual=True,
             manual_instructions=(
-                "Add the following lines to ~/.profile:\n\n"
+                "Open the file in a terminal:\n\n"
+                "nano ~/.profile\n\n"
+                "Add the following lines:\n\n"
                 f'export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-{WINE_VERSION}/bin"\n'
                 "export WINEFSYNC=1\n\n"
-                "If using LightDM or similar, also add to ~/.xsessionrc:\n\n"
+                "If your display manager does not source ~/.profile at login (e.g. LightDM),\n"
+                "also open ~/.xsessionrc:\n\n"
+                "nano ~/.xsessionrc\n\n"
+                "And add:\n\n"
                 'if [ -r "$HOME/.profile" ]; then\n'
                 '    . "$HOME/.profile"\n'
                 "fi\n"

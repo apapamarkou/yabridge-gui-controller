@@ -138,12 +138,18 @@ class SetupDialog(QDialog):
         h.addWidget(detail_lbl)
 
         if check.status != CheckStatus.OK:
+            _MANUAL_KEYS = {
+                "configure_rt_limits",
+                "configure_profile",
+                "add_audio_group",
+                "configure_wine",
+            }
             if check.fix_available and self._distro.supported:
                 fix_btn = QPushButton("Fix")
                 fix_btn.setFixedWidth(60)
                 fix_btn.clicked.connect(lambda _, c=check: self._attempt_fix(c))
                 h.addWidget(fix_btn)
-            elif check.fix_key in ("configure_rt_limits", "configure_profile", "add_audio_group"):
+            elif check.fix_key in _MANUAL_KEYS:
                 instr_btn = QPushButton("Instructions")
                 instr_btn.setFixedWidth(90)
                 instr_btn.clicked.connect(lambda _, c=check: self._show_manual_instructions(c))
@@ -198,27 +204,34 @@ class SetupDialog(QDialog):
 
     def _show_plan_instructions(self, plan: InstallPlan) -> None:
         dlg = QDialog(self)
-        dlg.setWindowTitle(f"Manual Action: {plan.title}")
-        dlg.setMinimumSize(500, 300)
+        dlg.setWindowTitle(f"Instructions: {plan.title}")
+        dlg.setMinimumSize(560, 360)
         layout = QVBoxLayout(dlg)
         layout.addWidget(
-            QLabel(
-                "<b>Manual action required</b><br>This configuration cannot safely be changed automatically."
-            )
+            QLabel("<b>Manual action required</b> — copy the commands below into a terminal.")
         )
         text = QTextEdit()
         text.setReadOnly(True)
+        text.setFontFamily("monospace")
         text.setPlainText(plan.manual_instructions)
         layout.addWidget(text)
-        btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        btn.rejected.connect(dlg.reject)
-        layout.addWidget(btn)
+        btn_row = QHBoxLayout()
+        copy_btn = QPushButton("Copy to Clipboard")
+        copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(plan.manual_instructions))
+        close_btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        close_btn.rejected.connect(dlg.reject)
+        btn_row.addWidget(copy_btn)
+        btn_row.addStretch()
+        layout.addLayout(btn_row)
+        layout.addWidget(close_btn)
         dlg.exec()
 
     def _get_plan_for(self, fix_key: str) -> InstallPlan | None:
         match fix_key:
             case "install_wine":
-                return self._installer.plan_install_wine_tarball()
+                return self._installer.plan_install_wine_full()
+            case "configure_wine":
+                return self._installer.plan_configure_wine()
             case "install_yabridge":
                 return self._installer.plan_install_yabridge()
             case "install_pipewire_jack":
@@ -234,8 +247,6 @@ class SetupDialog(QDialog):
             case "add_audio_group":
                 return self._installer.plan_add_audio_group()
             case "enable_wireplumber":
-                from yabridge_gui.core.installer import InstallPlan
-
                 return InstallPlan(
                     title="Enable WirePlumber",
                     commands=["systemctl --user --now enable wireplumber.service"],
