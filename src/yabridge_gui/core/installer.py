@@ -146,9 +146,8 @@ class BaseInstaller(ABC):
             home / ".wine/drive_c/Program Files/Common Files/VST3",
             home / ".wine/drive_c/Program Files/VSTPlugins",
         ]
-        yabridge_dir = home / ".local/share/yabridge"
         cmds = [f'yabridgectl add "{d}"' for d in vst_dirs]
-        cmds.append(f'yabridgectl set --path="{yabridge_dir}"')
+        cmds.append("yabridgectl set --path-auto")
         return InstallPlan(title="Configure yabridge paths", commands=cmds, requires_sudo=False)
 
     def plan_add_audio_group(self) -> InstallPlan:

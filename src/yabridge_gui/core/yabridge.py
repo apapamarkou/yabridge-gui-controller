@@ -108,7 +108,7 @@ def configure_yabridge_paths() -> None:
     for d in VST_DIRS:
         subprocess.run([cmd, "add", str(d)], check=False, capture_output=True)
 
-    subprocess.run([cmd, "set", f"--path={YABRIDGE_DIR}"], check=True, capture_output=True)
+    subprocess.run([cmd, "set", "--path-auto"], check=True, capture_output=True)
 
 
 def _which(cmd: str) -> bool:
