@@ -243,7 +243,9 @@ class SetupDialog(QDialog):
 
         if check.logout_warning:
             warn_lbl = QLabel(f"  \u27f3 {check.logout_warning}")
-            warn_lbl.setStyleSheet("color: orange; font-size: 11px; padding-left: 24px;")
+            warn_lbl.setStyleSheet(
+                "color: #ffffff; background: #cc0000; font-size: 11px; padding: 2px 6px; border-radius: 3px;"
+            )
             warn_lbl.setWordWrap(True)
             v.addWidget(warn_lbl)
 
