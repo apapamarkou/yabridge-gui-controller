@@ -99,20 +99,24 @@ class BaseInstaller(ABC):
         )
 
     def plan_install_wine_tarball(self) -> InstallPlan:
+        from pathlib import Path
+
+        home = str(Path.home())
+        apps_dir = f"{home}/.local/share/applications"
         desktop_entry = (
-            f'mkdir -p "$HOME/.local/share/applications"\n'
-            f"cat > \"$HOME/.local/share/applications/wine921.desktop\" <<'EOF'\n"
+            f'mkdir -p "{apps_dir}"\n'
+            f'cat > "{apps_dir}/wine921.desktop" <<\'EOF\'\n'
             f"[Desktop Entry]\n"
             f"Name=Wine 9.21\n"
             f"Comment=Run Windows applications with Wine 9.21\n"
-            f"Exec=$HOME/.local/share/wine-staging-{WINE_VERSION}/bin/wine %f\n"
+            f"Exec={home}/.local/share/wine-staging-{WINE_VERSION}/bin/wine %f\n"
             f"Terminal=false\n"
             f"Type=Application\n"
             f"MimeType=application/x-ms-dos-executable;application/x-msdownload;\n"
             f"NoDisplay=false\n"
             f"Categories=Utility;\n"
             f"EOF\n"
-            f'update-desktop-database "$HOME/.local/share/applications"'
+            f'update-desktop-database "{apps_dir}"'
         )
         return InstallPlan(
             title="Install Wine Staging",
