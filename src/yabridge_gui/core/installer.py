@@ -211,19 +211,45 @@ class BaseInstaller(ABC):
         )
 
     def execute_plan(self, plan: InstallPlan) -> tuple[bool, str]:
-        """Execute a non-manual plan. Returns (success, output)."""
+        """Execute a non-manual plan. Returns (success, output).
+
+        All sudo commands are batched into a single pkexec call so the user
+        is only prompted for a password once.
+        """
         if plan.is_manual:
             return False, "Manual action required"
-        output_lines = []
+
+        sudo_cmds: list[str] = []
+        other_cmds: list[str] = []
         for cmd_str in plan.commands:
-            # Multi-line commands (e.g. desktop entry heredoc) run via bash -c
+            parts = _parse_cmd(cmd_str) if not ("\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|"))) else []
+            if parts and parts[0] == "sudo":
+                sudo_cmds.append(" ".join(parts[1:]))
+            else:
+                other_cmds.append(cmd_str)
+
+        output_lines: list[str] = []
+
+        # Run all sudo commands in one pkexec bash -c invocation
+        if sudo_cmds:
+            combined = " && ".join(sudo_cmds)
+            try:
+                r = subprocess.run(
+                    ["pkexec", "bash", "-c", combined],
+                    capture_output=True, text=True, timeout=300,
+                )
+                output_lines.append(r.stdout + r.stderr)
+                if r.returncode != 0:
+                    return False, "\n".join(output_lines)
+            except (FileNotFoundError, OSError, subprocess.TimeoutExpired) as e:
+                return False, str(e)
+
+        # Run non-sudo commands individually
+        for cmd_str in other_cmds:
             if "\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|")):
                 parts = ["bash", "-c", cmd_str]
             else:
                 parts = _parse_cmd(cmd_str)
-                # Wrap sudo commands with pkexec for GUI password prompt
-                if parts and parts[0] == "sudo":
-                    parts = ["pkexec"] + parts[1:]
             try:
                 r = subprocess.run(parts, capture_output=True, text=True, timeout=300)
                 output_lines.append(r.stdout + r.stderr)
@@ -231,6 +257,7 @@ class BaseInstaller(ABC):
                     return False, "\n".join(output_lines)
             except (FileNotFoundError, OSError, subprocess.TimeoutExpired) as e:
                 return False, str(e)
+
         return True, "\n".join(output_lines)
 
 

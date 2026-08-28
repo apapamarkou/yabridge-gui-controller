@@ -33,42 +33,12 @@ _STATUS_ICONS = {
     CheckStatus.UNSUPPORTED: ("—", "color: gray;"),
 }
 
-
 _SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
-
-class _SpinnerDialog(QDialog):
-    def __init__(self, title: str, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle(title)
-        self.setFixedSize(300, 90)
-        self.setWindowFlags(
-            Qt.WindowType.Dialog
-            | Qt.WindowType.CustomizeWindowHint
-            | Qt.WindowType.WindowTitleHint
-        )
-        self._frame = 0
-        layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._lbl = QLabel()
-        self._lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._lbl.setStyleSheet("font-size: 22px;")
-        layout.addWidget(self._lbl)
-        msg = QLabel("Running, please wait\u2026")
-        msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(msg)
-        self._timer = QTimer(self)
-        self._timer.timeout.connect(self._tick)
-        self._timer.start(80)
-        self._tick()
-
-    def _tick(self) -> None:
-        self._lbl.setText(_SPINNER_FRAMES[self._frame % len(_SPINNER_FRAMES)])
-        self._frame += 1
-
-    def stop(self) -> None:
-        self._timer.stop()
-        self.accept()
+# fix_keys whose instructions dialog has NO copy button
+_NO_COPY_KEYS = {"configure_profile", "configure_rt_limits"}
+# fix_keys whose copy button is labelled "Copy command" (singular)
+_COPY_SINGULAR_KEYS = {"add_audio_group"}
 
 
 class _WorkerThread(QThread):
@@ -94,13 +64,16 @@ class SetupDialog(QDialog):
         self._distro = detect_distribution()
         self._installer = get_installer(self._distro)
         self._checks: list[EnvironmentCheck] = []
+        self._active_check_name: str | None = None
+        self._spinner_timer: QTimer | None = None
+        self._spinner_frame: int = 0
+        self._spinner_label: QLabel | None = None
         self._init_ui()
         self._refresh()
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
 
-        # Distro info
         distro_label = QLabel(
             f"<b>Distribution:</b> {self._distro.name} {self._distro.version} "
             f"({'Supported' if self._distro.supported else 'Not supported'})"
@@ -115,7 +88,6 @@ class SetupDialog(QDialog):
             warn.setWordWrap(True)
             layout.addWidget(warn)
 
-        # Checks area
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         self._checks_widget = QWidget()
@@ -124,7 +96,6 @@ class SetupDialog(QDialog):
         scroll.setWidget(self._checks_widget)
         layout.addWidget(scroll)
 
-        # Buttons
         btn_layout = QHBoxLayout()
         refresh_btn = QPushButton("Refresh")
         refresh_btn.clicked.connect(self._refresh)
@@ -144,12 +115,11 @@ class SetupDialog(QDialog):
 
     def _refresh(self) -> None:
         self._checks = run_environment_checks()
-        # Clear existing rows
+        self._spinner_label = None
         while self._checks_layout.count():
             item = self._checks_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-
         for check in self._checks:
             self._checks_layout.addWidget(self._make_check_row(check))
 
@@ -163,9 +133,15 @@ class SetupDialog(QDialog):
         h = QHBoxLayout(row)
         h.setContentsMargins(4, 2, 4, 2)
 
-        icon, style = _STATUS_ICONS.get(check.status, ("?", ""))
-        icon_lbl = QLabel(icon)
-        icon_lbl.setStyleSheet(style)
+        is_active = self._active_check_name == check.name
+        if is_active:
+            icon_lbl = QLabel(_SPINNER_FRAMES[0])
+            icon_lbl.setStyleSheet("color: #4a9eff;")
+            self._spinner_label = icon_lbl
+        else:
+            icon, style = _STATUS_ICONS.get(check.status, ("?", ""))
+            icon_lbl = QLabel(icon)
+            icon_lbl.setStyleSheet(style)
         icon_lbl.setFixedWidth(20)
 
         name_lbl = QLabel(f"<b>{check.label}</b>")
@@ -179,7 +155,7 @@ class SetupDialog(QDialog):
         h.addWidget(name_lbl)
         h.addWidget(detail_lbl)
 
-        if check.status != CheckStatus.OK:
+        if check.status != CheckStatus.OK and not is_active:
             _MANUAL_KEYS = {
                 "configure_rt_limits",
                 "configure_profile",
@@ -200,7 +176,7 @@ class SetupDialog(QDialog):
         v.addWidget(row)
 
         if check.logout_warning:
-            warn_lbl = QLabel(f"  ⟳ {check.logout_warning}")
+            warn_lbl = QLabel(f"  \u27f3 {check.logout_warning}")
             warn_lbl.setStyleSheet("color: orange; font-size: 11px; padding-left: 24px;")
             warn_lbl.setWordWrap(True)
             v.addWidget(warn_lbl)
@@ -213,10 +189,9 @@ class SetupDialog(QDialog):
             return
 
         if plan.is_manual:
-            self._show_plan_instructions(plan)
+            self._show_plan_instructions(plan, check.fix_key)
             return
 
-        # Show confirmation
         cmd_text = "\n".join(plan.commands)
         sudo_note = (
             "\n\nAdministrator privileges (sudo) will be required." if plan.requires_sudo else ""
@@ -236,14 +211,31 @@ class SetupDialog(QDialog):
         if msg.exec() != QMessageBox.StandardButton.Ok:
             return
 
-        self._spinner = _SpinnerDialog(plan.title, self)
+        self._active_check_name = check.name
+        self._spinner_frame = 0
+        self._refresh()  # rebuilds rows; _make_check_row captures self._spinner_label
+
+        self._spinner_timer = QTimer(self)
+        self._spinner_timer.timeout.connect(self._tick_spinner)
+        self._spinner_timer.start(80)
+
         self._worker = _WorkerThread(plan)
         self._worker.finished.connect(lambda ok, out: self._on_worker_done(ok, out, plan.title))
         self._worker.start()
-        self._spinner.exec()
+
+    def _tick_spinner(self) -> None:
+        if self._spinner_label is not None:
+            self._spinner_label.setText(
+                _SPINNER_FRAMES[self._spinner_frame % len(_SPINNER_FRAMES)]
+            )
+        self._spinner_frame += 1
 
     def _on_worker_done(self, ok: bool, output: str, title: str) -> None:
-        self._spinner.stop()
+        if self._spinner_timer:
+            self._spinner_timer.stop()
+            self._spinner_timer = None
+        self._active_check_name = None
+        self._spinner_label = None
         self._show_output_dialog(ok, title, output)
         self._refresh()
 
@@ -271,9 +263,9 @@ class SetupDialog(QDialog):
     def _show_manual_instructions(self, check: EnvironmentCheck) -> None:
         plan = self._get_plan_for(check.fix_key)
         if plan:
-            self._show_plan_instructions(plan)
+            self._show_plan_instructions(plan, check.fix_key)
 
-    def _show_plan_instructions(self, plan: InstallPlan) -> None:
+    def _show_plan_instructions(self, plan: InstallPlan, fix_key: str = "") -> None:
         dlg = QDialog(self)
         dlg.setWindowTitle(f"Instructions: {plan.title}")
         dlg.setMinimumSize(560, 360)
@@ -287,12 +279,14 @@ class SetupDialog(QDialog):
         text.setPlainText(plan.manual_instructions)
         layout.addWidget(text)
         btn_row = QHBoxLayout()
-        copy_btn = QPushButton("Copy Commands")
-        clipboard_text = "\n".join(plan.copyable_commands)
-        copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(clipboard_text))
+        if fix_key not in _NO_COPY_KEYS:
+            label = "Copy command" if fix_key in _COPY_SINGULAR_KEYS else "Copy Commands"
+            copy_btn = QPushButton(label)
+            clipboard_text = "\n".join(plan.copyable_commands)
+            copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(clipboard_text))
+            btn_row.addWidget(copy_btn)
         close_btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         close_btn.rejected.connect(dlg.reject)
-        btn_row.addWidget(copy_btn)
         btn_row.addStretch()
         layout.addLayout(btn_row)
         layout.addWidget(close_btn)
@@ -352,7 +346,6 @@ class SetupDialog(QDialog):
         import subprocess
 
         doc_file = self._distro.doc_file or "others.md"
-        # Try to find the doc relative to the project
         candidates = [
             Path(__file__).parent.parent.parent.parent / doc_file,
             Path(f"/usr/share/doc/yabridge-gui-controller/{doc_file}"),

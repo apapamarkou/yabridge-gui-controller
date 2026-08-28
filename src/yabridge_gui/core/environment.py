@@ -310,12 +310,12 @@ def check_profile_paths() -> EnvironmentCheck:
 def run_environment_checks() -> list[EnvironmentCheck]:
     return [
         check_wine(),
-        check_wine_configured(),
         check_yabridge_binary(),
         check_yabridge(),
         check_profile_paths(),
         check_audio_group(),
         check_realtime_limits(),
+        check_wine_configured(),
         check_vst_dirs(),
         check_yabridge_paths(),
         check_pipewire(),
