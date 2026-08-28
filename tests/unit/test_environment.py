@@ -35,7 +35,7 @@ def test_check_realtime_limits_ok():
     with patch("yabridge_gui.core.environment.Path") as mock_path:
         mock_path.return_value.exists.return_value = True
         mock_path.return_value.read_text.return_value = (
-            "@audio - rtprio 95\n@audio - memlock unlimited\n"
+            "@audio - rtprio 95\n@audio - memlock unlimited\n@audio - nice 10\n"
         )
         result = check_realtime_limits()
     assert result.status == CheckStatus.OK
@@ -54,8 +54,17 @@ def test_check_profile_paths_ok(tmp_path):
         'export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-9.21/bin"\n'
         "export WINEFSYNC=1\n"
     )
-    fake_path = "/usr/bin:" + str(tmp_path) + "/.local/share/yabridge:" + str(tmp_path) + "/.local/share/wine-staging-9.21/bin"
-    with patch.object(Path, "home", return_value=tmp_path), patch.dict(os.environ, {"PATH": fake_path}):
+    fake_path = (
+        "/usr/bin:"
+        + str(tmp_path)
+        + "/.local/share/yabridge:"
+        + str(tmp_path)
+        + "/.local/share/wine-staging-9.21/bin"
+    )
+    with (
+        patch.object(Path, "home", return_value=tmp_path),
+        patch.dict(os.environ, {"PATH": fake_path}),
+    ):
         result = check_profile_paths()
     assert result.status == CheckStatus.OK
 

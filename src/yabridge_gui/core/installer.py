@@ -106,7 +106,7 @@ class BaseInstaller(ABC):
         apps_dir = f"{home}/.local/share/applications"
         desktop_entry = (
             f'mkdir -p "{apps_dir}"\n'
-            f'cat > "{apps_dir}/wine921.desktop" <<\'EOF\'\n'
+            f"cat > \"{apps_dir}/wine921.desktop\" <<'EOF'\n"
             f"[Desktop Entry]\n"
             f"Name=Wine 9.21\n"
             f"Comment=Run Windows applications with Wine 9.21\n"
@@ -189,16 +189,16 @@ class BaseInstaller(ABC):
         )
 
     def plan_configure_rt_limits_auto(self) -> InstallPlan:
-        """Append only missing @audio lines to /etc/security/limits.conf."""
+        """Insert only missing @audio lines before '# End of file' in /etc/security/limits.conf."""
         limits_file = "/etc/security/limits.conf"
         try:
             content = Path(limits_file).read_text()
         except OSError:
             content = ""
         lines_to_add = []
-        if "rtprio" not in content:
+        if "rtprio" not in content or "@audio" not in content:
             lines_to_add.append("@audio           -      rtprio           95")
-        if "memlock" not in content:
+        if "memlock" not in content or "@audio" not in content:
             lines_to_add.append("@audio           -      memlock          unlimited")
         if "nice" not in content or "@audio" not in content:
             lines_to_add.append("@audio           -      nice             10")
@@ -210,10 +210,19 @@ class BaseInstaller(ABC):
                 manual_instructions="All required lines already present.",
             )
         block = "\n".join(lines_to_add)
-        cmd = f"printf '\\n{block}\\n' | sudo tee -a {limits_file}"
+        if "# End of file" in content:
+            new_content = content.replace("# End of file", f"{block}\n# End of file", 1)
+        else:
+            new_content = content.rstrip("\n") + f"\n{block}\n# End of file\n"
+        # Write to a temp file, then pkexec cp it into place
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".conf", delete=False) as tmp:
+            tmp.write(new_content)
+            tmp_name = tmp.name
         return InstallPlan(
             title="Configure realtime limits (auto)",
-            commands=[cmd],
+            commands=[f"pkexec cp {tmp_name} {limits_file}"],
             requires_sudo=True,
         )
 
@@ -249,7 +258,10 @@ class BaseInstaller(ABC):
 
         profile_content = profile.read_text() if profile.exists() else ""
         lines_to_add = []
-        if ".local/share/yabridge" not in profile_content or f"wine-staging-{WINE_VERSION}" not in profile_content:
+        if (
+            ".local/share/yabridge" not in profile_content
+            or f"wine-staging-{WINE_VERSION}" not in profile_content
+        ):
             lines_to_add.append(
                 f'export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-{WINE_VERSION}/bin"'
             )
@@ -292,7 +304,11 @@ class BaseInstaller(ABC):
         sudo_cmds: list[str] = []
         other_cmds: list[str] = []
         for cmd_str in plan.commands:
-            parts = _parse_cmd(cmd_str) if not ("\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|"))) else []
+            parts = (
+                _parse_cmd(cmd_str)
+                if not ("\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|")))
+                else []
+            )
             if parts and parts[0] == "sudo":
                 sudo_cmds.append(" ".join(parts[1:]))
             else:
@@ -306,7 +322,9 @@ class BaseInstaller(ABC):
             try:
                 r = subprocess.run(
                     ["pkexec", "bash", "-c", combined],
-                    capture_output=True, text=True, timeout=300,
+                    capture_output=True,
+                    text=True,
+                    timeout=300,
                 )
                 output_lines.append(r.stdout + r.stderr)
                 if r.returncode != 0:

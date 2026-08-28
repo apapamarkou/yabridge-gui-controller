@@ -156,15 +156,21 @@ def check_realtime_limits() -> EnvironmentCheck:
     content = limits_file.read_text()
     has_rtprio = "@audio" in content and "rtprio" in content
     has_memlock = "@audio" in content and "memlock" in content
-    if has_rtprio and has_memlock:
+    has_nice = "@audio" in content and "nice" in content
+    if has_rtprio and has_memlock and has_nice:
         return EnvironmentCheck(
-            "rt_limits", "Realtime limits", CheckStatus.OK, "rtprio + memlock configured"
+            "rt_limits", "Realtime limits", CheckStatus.OK, "rtprio + memlock + nice configured"
         )
+    missing = [
+        x
+        for x, ok in [("rtprio", has_rtprio), ("memlock", has_memlock), ("nice", has_nice)]
+        if not ok
+    ]
     return EnvironmentCheck(
         "rt_limits",
         "Realtime limits",
         CheckStatus.WARNING,
-        "Missing @audio rtprio/memlock in /etc/security/limits.conf",
+        f"Missing @audio {', '.join(missing)} in /etc/security/limits.conf",
         fix_available=True,
         fix_key="configure_rt_limits",
     )
@@ -304,14 +310,14 @@ def check_profile_paths() -> EnvironmentCheck:
 
 def run_environment_checks() -> list[EnvironmentCheck]:
     return [
-        check_wine(),           # 1
-        check_yabridge(),       # 2  (binary + ctl merged)
+        check_wine(),  # 1
+        check_yabridge(),  # 2  (binary + ctl merged)
         check_profile_paths(),  # 3
-        check_audio_group(),    # 4
-        check_realtime_limits(), # 5
-        check_wine_configured(), # 6  (needs logout first if 3/4 pending)
-        check_vst_dirs(),        # 7
+        check_audio_group(),  # 4
+        check_realtime_limits(),  # 5
+        check_wine_configured(),  # 6  (needs logout first if 3/4 pending)
+        check_vst_dirs(),  # 7
         check_yabridge_paths(),  # 8
-        check_pipewire(),        # 9
-        check_wireplumber(),     # 10
+        check_pipewire(),  # 9
+        check_wireplumber(),  # 10
     ]

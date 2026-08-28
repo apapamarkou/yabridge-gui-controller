@@ -38,16 +38,16 @@ _SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇"
 # Ordered setup steps: (check_name, fix_key).
 # Steps 0-4 are "phase 1" (before logout); 5-9 are "phase 2" (after logout).
 _SETUP_ORDER: list[str] = [
-    "wine",           # 0
-    "yabridge",       # 1
+    "wine",  # 0
+    "yabridge",  # 1
     "profile_paths",  # 2
-    "audio_group",    # 3
-    "rt_limits",      # 4
-    "wine_configured",# 5
-    "vst_dirs",       # 6
-    "yabridge_paths", # 7
-    "pipewire",       # 8
-    "wireplumber",    # 9
+    "audio_group",  # 3
+    "rt_limits",  # 4
+    "wine_configured",  # 5
+    "vst_dirs",  # 6
+    "yabridge_paths",  # 7
+    "pipewire",  # 8
+    "wireplumber",  # 9
 ]
 
 # Index of first phase-2 step (needs logout before proceeding)
@@ -106,7 +106,7 @@ class SetupDialog(QDialog):
         self._logout_banner = QLabel()
         self._logout_banner.setWordWrap(True)
         self._logout_banner.setStyleSheet(
-            "background: #3a2a00; color: #ffcc44; padding: 6px; border-radius: 4px;"
+            "background: #cc0000; color: #ffffff; padding: 6px; border-radius: 4px;"
         )
         self._logout_banner.hide()
         layout.addWidget(self._logout_banner)
@@ -158,8 +158,14 @@ class SetupDialog(QDialog):
             return False
         profile = self._check_by_name("profile_paths")
         audio = self._check_by_name("audio_group")
-        profile_pending = profile is not None and profile.status == CheckStatus.WARNING and bool(profile.logout_warning)
-        audio_pending = audio is not None and audio.status == CheckStatus.WARNING and bool(audio.logout_warning)
+        profile_pending = (
+            profile is not None
+            and profile.status == CheckStatus.WARNING
+            and bool(profile.logout_warning)
+        )
+        audio_pending = (
+            audio is not None and audio.status == CheckStatus.WARNING and bool(audio.logout_warning)
+        )
         return profile_pending or audio_pending
 
     # ------------------------------------------------------------------
@@ -189,9 +195,8 @@ class SetupDialog(QDialog):
         waiting_logout = self._needs_logout_before_phase2()
         for check in self._checks:
             step_idx = _SETUP_ORDER.index(check.name) if check.name in _SETUP_ORDER else -1
-            btn_enabled = (
-                step_idx == active_idx
-                and not (waiting_logout and step_idx >= _PHASE2_START)
+            btn_enabled = step_idx == active_idx and not (
+                waiting_logout and step_idx >= _PHASE2_START
             )
             self._checks_layout.addWidget(self._make_check_row(check, btn_enabled))
 
@@ -317,9 +322,7 @@ class SetupDialog(QDialog):
             return
 
         cmd_text = "\n".join(plan.commands)
-        sudo_note = (
-            "\n\nAdministrator privileges will be required." if plan.requires_sudo else ""
-        )
+        sudo_note = "\n\nAdministrator privileges will be required." if plan.requires_sudo else ""
         logout_note = (
             "\n\nA logout/reboot will be required after this change."
             if plan.requires_logout
@@ -349,9 +352,7 @@ class SetupDialog(QDialog):
 
     def _tick_spinner(self) -> None:
         if self._spinner_label is not None:
-            self._spinner_label.setText(
-                _SPINNER_FRAMES[self._spinner_frame % len(_SPINNER_FRAMES)]
-            )
+            self._spinner_label.setText(_SPINNER_FRAMES[self._spinner_frame % len(_SPINNER_FRAMES)])
         self._spinner_frame += 1
 
     def _on_worker_done(self, ok: bool, output: str, title: str) -> None:
