@@ -231,21 +231,25 @@ def check_vst_dirs() -> EnvironmentCheck:
 
 
 def check_yabridge_paths() -> EnvironmentCheck:
-    ok, out = _run(["yabridgectl", "status"])
-    if not ok:
-        # Try local binary
-        local = Path.home() / ".local/share/yabridge/yabridgectl"
-        if local.exists():
-            ok, out = _run([str(local), "status"])
-    if ok and out:
-        return EnvironmentCheck(
-            "yabridge_paths", "yabridge paths", CheckStatus.OK, "Paths configured"
-        )
+    local = Path.home() / ".local/share/yabridge/yabridgectl"
+    ctl = str(local) if local.exists() else "yabridgectl"
+    ok, out = _run([ctl, "list"])
+    if ok:
+        expected = [
+            str(Path.home() / ".wine/drive_c/Program Files/Common Files/VST3"),
+            str(Path.home() / ".wine/drive_c/Program Files/Steinberg/VstPlugins"),
+            str(Path.home() / ".wine/drive_c/Program Files/VSTPlugins"),
+        ]
+        configured = [line.strip() for line in out.splitlines() if line.strip()]
+        if all(d in configured for d in expected):
+            return EnvironmentCheck(
+                "yabridge_paths", "yabridge paths", CheckStatus.OK, "Paths configured"
+            )
     return EnvironmentCheck(
         "yabridge_paths",
         "yabridge paths",
         CheckStatus.WARNING,
-        "No paths configured in yabridgectl",
+        "VST paths not configured in yabridgectl",
         fix_available=True,
         fix_key="configure_yabridge_paths",
     )

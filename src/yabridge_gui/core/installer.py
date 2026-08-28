@@ -140,10 +140,13 @@ class BaseInstaller(ABC):
         )
 
     def plan_configure_yabridge_paths(self) -> InstallPlan:
-        from yabridge_gui.core.yabridge import VST_DIRS
-
-        cmds = [f'yabridgectl add "{d}"' for d in VST_DIRS]
-        cmds.append(f"yabridgectl set --path={YABRIDGE_DIR}")
+        vst_dirs = [
+            "$HOME/.wine/drive_c/Program Files/Steinberg/VstPlugins",
+            "$HOME/.wine/drive_c/Program Files/Common Files/VST3",
+            "$HOME/.wine/drive_c/Program Files/VSTPlugins",
+        ]
+        cmds = [f'yabridgectl add "{d}"' for d in vst_dirs]
+        cmds.append('yabridgectl set --path="$HOME/.local/share/yabridge"')
         return InstallPlan(title="Configure yabridge paths", commands=cmds, requires_sudo=False)
 
     def plan_add_audio_group(self) -> InstallPlan:
@@ -306,7 +309,7 @@ class BaseInstaller(ABC):
         for cmd_str in plan.commands:
             parts = (
                 _parse_cmd(cmd_str)
-                if not ("\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|")))
+                if not ("\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|", "$")))
                 else []
             )
             if parts and parts[0] == "sudo":
