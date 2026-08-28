@@ -82,36 +82,33 @@ def check_wine_configured() -> EnvironmentCheck:
 
 
 def check_yabridge() -> EnvironmentCheck:
-    ok, ver = _command_version("yabridgectl")
-    if ok:
-        return EnvironmentCheck("yabridgectl", "yabridgectl", CheckStatus.OK, ver)
-    local = Path.home() / ".local/share/yabridge/yabridgectl"
-    if local.exists():
-        ok2, ver2 = _run([str(local), "--version"])
-        if ok2:
-            return EnvironmentCheck("yabridgectl", "yabridgectl", CheckStatus.OK, ver2)
-    return EnvironmentCheck(
-        "yabridgectl",
-        "yabridgectl",
-        CheckStatus.MISSING,
-        "Not found",
-        fix_available=True,
-        fix_key="install_yabridge",
-    )
-
-
-def check_yabridge_binary() -> EnvironmentCheck:
-    paths = [
+    """Single check covering both the yabridge binaries and yabridgectl."""
+    binary_paths = [
         Path.home() / ".local/share/yabridge/libyabridge-chainloader-vst2.so",
         Path.home() / ".local/share/yabridge/libyabridge-chainloader-vst3.so",
     ]
-    if any(p.exists() for p in paths):
-        return EnvironmentCheck("yabridge", "yabridge", CheckStatus.OK, str(paths[0].parent))
+    has_binary = any(p.exists() for p in binary_paths)
+
+    ok, ver = _command_version("yabridgectl")
+    if not ok:
+        local = Path.home() / ".local/share/yabridge/yabridgectl"
+        if local.exists():
+            ok, ver = _run([str(local), "--version"])
+            ver = ver.splitlines()[0] if ver else ""
+    has_ctl = ok
+
+    if has_binary and has_ctl:
+        return EnvironmentCheck("yabridge", "yabridge", CheckStatus.OK, ver)
+    missing = []
+    if not has_binary:
+        missing.append("binaries")
+    if not has_ctl:
+        missing.append("yabridgectl")
     return EnvironmentCheck(
         "yabridge",
         "yabridge",
         CheckStatus.MISSING,
-        "Not found in ~/.local/share/yabridge",
+        f"Missing: {', '.join(missing)}",
         fix_available=True,
         fix_key="install_yabridge",
     )
@@ -122,8 +119,6 @@ def check_audio_group() -> EnvironmentCheck:
     try:
         audio_group = grp.getgrnam("audio")
         if username in audio_group.gr_mem:
-            # Check if the group is active in the current session
-            import subprocess
             result = subprocess.run(["id", "-Gn"], capture_output=True, text=True)
             active_groups = result.stdout.split()
             if "audio" not in active_groups:
@@ -142,7 +137,7 @@ def check_audio_group() -> EnvironmentCheck:
             "Audio group",
             CheckStatus.WARNING,
             f"User '{username}' not in audio group",
-            fix_available=False,
+            fix_available=True,
             fix_key="add_audio_group",
             logout_warning="Logout or restart required after being added to the audio group.",
         )
@@ -170,7 +165,7 @@ def check_realtime_limits() -> EnvironmentCheck:
         "Realtime limits",
         CheckStatus.WARNING,
         "Missing @audio rtprio/memlock in /etc/security/limits.conf",
-        fix_available=False,
+        fix_available=True,
         fix_key="configure_rt_limits",
     )
 
@@ -302,22 +297,21 @@ def check_profile_paths() -> EnvironmentCheck:
         "PATH (yabridge/wine)",
         CheckStatus.WARNING,
         f"~/.profile missing: {', '.join(missing)}",
-        fix_available=False,
+        fix_available=True,
         fix_key="configure_profile",
     )
 
 
 def run_environment_checks() -> list[EnvironmentCheck]:
     return [
-        check_wine(),
-        check_yabridge_binary(),
-        check_yabridge(),
-        check_profile_paths(),
-        check_audio_group(),
-        check_realtime_limits(),
-        check_wine_configured(),
-        check_vst_dirs(),
-        check_yabridge_paths(),
-        check_pipewire(),
-        check_wireplumber(),
+        check_wine(),           # 1
+        check_yabridge(),       # 2  (binary + ctl merged)
+        check_profile_paths(),  # 3
+        check_audio_group(),    # 4
+        check_realtime_limits(), # 5
+        check_wine_configured(), # 6  (needs logout first if 3/4 pending)
+        check_vst_dirs(),        # 7
+        check_yabridge_paths(),  # 8
+        check_pipewire(),        # 9
+        check_wireplumber(),     # 10
     ]

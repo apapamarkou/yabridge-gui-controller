@@ -5,6 +5,7 @@ from __future__ import annotations
 import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 
 from yabridge_gui.core.distro import Distribution, detect_distribution
 from yabridge_gui.core.wine import WINE_DIR, WINE_URL, WINE_VERSION
@@ -154,11 +155,6 @@ class BaseInstaller(ABC):
             commands=[f"sudo usermod -a -G audio {user}"],
             requires_sudo=True,
             requires_logout=True,
-            is_manual=True,
-            manual_instructions=(
-                f"Run the following command in a terminal, then log out and back in:\n\n"
-                f"sudo usermod -a -G audio {user}\n"
-            ),
         )
 
     def plan_configure_wine(self) -> InstallPlan:
@@ -192,6 +188,35 @@ class BaseInstaller(ABC):
             ),
         )
 
+    def plan_configure_rt_limits_auto(self) -> InstallPlan:
+        """Append only missing @audio lines to /etc/security/limits.conf."""
+        limits_file = "/etc/security/limits.conf"
+        try:
+            content = Path(limits_file).read_text()
+        except OSError:
+            content = ""
+        lines_to_add = []
+        if "rtprio" not in content:
+            lines_to_add.append("@audio           -      rtprio           95")
+        if "memlock" not in content:
+            lines_to_add.append("@audio           -      memlock          unlimited")
+        if "nice" not in content or "@audio" not in content:
+            lines_to_add.append("@audio           -      nice             10")
+        if not lines_to_add:
+            return InstallPlan(
+                title="Configure realtime limits",
+                commands=[],
+                requires_sudo=False,
+                manual_instructions="All required lines already present.",
+            )
+        block = "\n".join(lines_to_add)
+        cmd = f"printf '\\n{block}\\n' | sudo tee -a {limits_file}"
+        return InstallPlan(
+            title="Configure realtime limits (auto)",
+            commands=[cmd],
+            requires_sudo=True,
+        )
+
     def plan_configure_profile(self) -> InstallPlan:
         return InstallPlan(
             title="Configure ~/.profile",
@@ -212,6 +237,47 @@ class BaseInstaller(ABC):
                 '    . "$HOME/.profile"\n'
                 "fi\n"
             ),
+        )
+
+    def plan_configure_profile_auto(self) -> InstallPlan:
+        """Append only missing PATH/env lines to ~/.profile (and ~/.xsessionrc if needed)."""
+        from pathlib import Path as _Path
+
+        home = _Path.home()
+        profile = home / ".profile"
+        xsession = home / ".xsessionrc"
+
+        profile_content = profile.read_text() if profile.exists() else ""
+        lines_to_add = []
+        if ".local/share/yabridge" not in profile_content or f"wine-staging-{WINE_VERSION}" not in profile_content:
+            lines_to_add.append(
+                f'export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-{WINE_VERSION}/bin"'
+            )
+        if "WINEFSYNC" not in profile_content:
+            lines_to_add.append("export WINEFSYNC=1")
+
+        cmds = []
+        if lines_to_add:
+            block = "\n".join(lines_to_add)
+            cmds.append(f"printf '\\n{block}\\n' >> {profile}")
+
+        xsession_content = xsession.read_text() if xsession.exists() else ""
+        source_snippet = '. "$HOME/.profile"'
+        if source_snippet not in xsession_content:
+            snippet = 'if [ -r "$HOME/.profile" ]; then\n    . "$HOME/.profile"\nfi'
+            cmds.append(f"printf '\\n{snippet}\\n' >> {xsession}")
+
+        if not cmds:
+            return InstallPlan(
+                title="Configure PATH (auto)",
+                commands=[],
+                requires_sudo=False,
+                manual_instructions="All required lines already present.",
+            )
+        return InstallPlan(
+            title="Configure PATH (auto)",
+            commands=cmds,
+            requires_sudo=False,
         )
 
     def execute_plan(self, plan: InstallPlan) -> tuple[bool, str]:

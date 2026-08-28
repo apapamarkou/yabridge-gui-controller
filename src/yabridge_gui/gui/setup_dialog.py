@@ -35,10 +35,23 @@ _STATUS_ICONS = {
 
 _SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
-# fix_keys whose instructions dialog has NO copy button
-_NO_COPY_KEYS = {"configure_profile", "configure_rt_limits"}
-# fix_keys whose copy button is labelled "Copy command" (singular)
-_COPY_SINGULAR_KEYS = {"add_audio_group"}
+# Ordered setup steps: (check_name, fix_key).
+# Steps 0-4 are "phase 1" (before logout); 5-9 are "phase 2" (after logout).
+_SETUP_ORDER: list[str] = [
+    "wine",           # 0
+    "yabridge",       # 1
+    "profile_paths",  # 2
+    "audio_group",    # 3
+    "rt_limits",      # 4
+    "wine_configured",# 5
+    "vst_dirs",       # 6
+    "yabridge_paths", # 7
+    "pipewire",       # 8
+    "wireplumber",    # 9
+]
+
+# Index of first phase-2 step (needs logout before proceeding)
+_PHASE2_START = 5
 
 
 class _WorkerThread(QThread):
@@ -60,7 +73,7 @@ class SetupDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Pro Audio Setup Assistant")
-        self.setMinimumSize(700, 500)
+        self.setMinimumSize(700, 520)
         self._distro = detect_distribution()
         self._installer = get_installer(self._distro)
         self._checks: list[EnvironmentCheck] = []
@@ -68,6 +81,7 @@ class SetupDialog(QDialog):
         self._spinner_timer: QTimer | None = None
         self._spinner_frame: int = 0
         self._spinner_label: QLabel | None = None
+        self._logout_banner: QLabel | None = None
         self._init_ui()
         self._refresh()
 
@@ -87,6 +101,15 @@ class SetupDialog(QDialog):
             )
             warn.setWordWrap(True)
             layout.addWidget(warn)
+
+        # Logout suggestion banner (hidden by default)
+        self._logout_banner = QLabel()
+        self._logout_banner.setWordWrap(True)
+        self._logout_banner.setStyleSheet(
+            "background: #3a2a00; color: #ffcc44; padding: 6px; border-radius: 4px;"
+        )
+        self._logout_banner.hide()
+        layout.addWidget(self._logout_banner)
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -113,17 +136,66 @@ class SetupDialog(QDialog):
         btn_layout.addWidget(close_btn)
         layout.addLayout(btn_layout)
 
+    # ------------------------------------------------------------------
+    # Ordering helpers
+    # ------------------------------------------------------------------
+
+    def _check_by_name(self, name: str) -> EnvironmentCheck | None:
+        return next((c for c in self._checks if c.name == name), None)
+
+    def _active_step_index(self) -> int:
+        """Return the index in _SETUP_ORDER of the first non-OK step."""
+        for i, name in enumerate(_SETUP_ORDER):
+            c = self._check_by_name(name)
+            if c is None or c.status != CheckStatus.OK:
+                return i
+        return len(_SETUP_ORDER)  # all done
+
+    def _needs_logout_before_phase2(self) -> bool:
+        """True when phase-1 is done but PATH/audio group are not yet active in session."""
+        active = self._active_step_index()
+        if active < _PHASE2_START:
+            return False
+        profile = self._check_by_name("profile_paths")
+        audio = self._check_by_name("audio_group")
+        profile_pending = profile is not None and profile.status == CheckStatus.WARNING and bool(profile.logout_warning)
+        audio_pending = audio is not None and audio.status == CheckStatus.WARNING and bool(audio.logout_warning)
+        return profile_pending or audio_pending
+
+    # ------------------------------------------------------------------
+    # Refresh / row building
+    # ------------------------------------------------------------------
+
     def _refresh(self) -> None:
         self._checks = run_environment_checks()
         self._spinner_label = None
+
+        # Update logout banner
+        if self._needs_logout_before_phase2():
+            self._logout_banner.setText(
+                "⟳  PATH or audio group changes are pending a session restart. "
+                "Please <b>logout and log back in</b>, then continue setup from step 6 onwards."
+            )
+            self._logout_banner.show()
+        else:
+            self._logout_banner.hide()
+
         while self._checks_layout.count():
             item = self._checks_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-        for check in self._checks:
-            self._checks_layout.addWidget(self._make_check_row(check))
 
-    def _make_check_row(self, check: EnvironmentCheck) -> QWidget:
+        active_idx = self._active_step_index()
+        waiting_logout = self._needs_logout_before_phase2()
+        for check in self._checks:
+            step_idx = _SETUP_ORDER.index(check.name) if check.name in _SETUP_ORDER else -1
+            btn_enabled = (
+                step_idx == active_idx
+                and not (waiting_logout and step_idx >= _PHASE2_START)
+            )
+            self._checks_layout.addWidget(self._make_check_row(check, btn_enabled))
+
+    def _make_check_row(self, check: EnvironmentCheck, btn_enabled: bool = True) -> QWidget:
         wrapper = QWidget()
         v = QVBoxLayout(wrapper)
         v.setContentsMargins(0, 0, 0, 0)
@@ -155,23 +227,12 @@ class SetupDialog(QDialog):
         h.addWidget(name_lbl)
         h.addWidget(detail_lbl)
 
-        if check.status != CheckStatus.OK and not is_active:
-            _MANUAL_KEYS = {
-                "configure_rt_limits",
-                "configure_profile",
-                "add_audio_group",
-                "configure_wine",
-            }
-            if check.fix_available and self._distro.supported:
-                fix_btn = QPushButton("Fix")
-                fix_btn.setFixedWidth(60)
-                fix_btn.clicked.connect(lambda _, c=check: self._attempt_fix(c))
-                h.addWidget(fix_btn)
-            elif check.fix_key in _MANUAL_KEYS:
-                instr_btn = QPushButton("Instructions")
-                instr_btn.setFixedWidth(90)
-                instr_btn.clicked.connect(lambda _, c=check: self._show_manual_instructions(c))
-                h.addWidget(instr_btn)
+        if check.status != CheckStatus.OK and not is_active and check.fix_key:
+            btn = QPushButton("Fix")
+            btn.setFixedWidth(60)
+            btn.setEnabled(btn_enabled and self._distro.supported)
+            btn.clicked.connect(lambda _, c=check: self._attempt_fix(c))
+            h.addWidget(btn)
 
         v.addWidget(row)
 
@@ -183,18 +244,81 @@ class SetupDialog(QDialog):
 
         return wrapper
 
+    # ------------------------------------------------------------------
+    # Fix flow
+    # ------------------------------------------------------------------
+
     def _attempt_fix(self, check: EnvironmentCheck) -> None:
+        if check.fix_key in ("configure_profile", "configure_rt_limits"):
+            self._ask_manual_or_auto(check)
+            return
+
         plan = self._get_plan_for(check.fix_key)
         if plan is None:
             return
+        self._confirm_and_run(check, plan)
 
+    def _ask_manual_or_auto(self, check: EnvironmentCheck) -> None:
+        """Show a dialog explaining config-file changes, then let user pick Manual or Auto."""
+        if check.fix_key == "configure_profile":
+            description = (
+                "This will add PATH and WINEFSYNC entries to <b>~/.profile</b> "
+                "and optionally <b>~/.xsessionrc</b>."
+            )
+        else:
+            description = (
+                "This will add <b>@audio</b> realtime priority lines to "
+                "<b>/etc/security/limits.conf</b>."
+            )
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle(f"Fix: {check.label}")
+        dlg.setMinimumWidth(420)
+        layout = QVBoxLayout(dlg)
+
+        info = QLabel(
+            f"<b>This operation requires config file changes.</b><br><br>{description}"
+            "<br><br>Choose how to proceed:"
+        )
+        info.setWordWrap(True)
+        layout.addWidget(info)
+
+        btn_row = QHBoxLayout()
+        manual_btn = QPushButton("Manual (Instructions)")
+        auto_btn = QPushButton("Auto")
+        cancel_btn = QPushButton("Cancel")
+        btn_row.addWidget(manual_btn)
+        btn_row.addWidget(auto_btn)
+        btn_row.addStretch()
+        btn_row.addWidget(cancel_btn)
+        layout.addLayout(btn_row)
+
+        choice: list[str] = []
+        manual_btn.clicked.connect(lambda: (choice.append("manual"), dlg.accept()))
+        auto_btn.clicked.connect(lambda: (choice.append("auto"), dlg.accept()))
+        cancel_btn.clicked.connect(dlg.reject)
+        if dlg.exec() != QDialog.DialogCode.Accepted or not choice:
+            return
+
+        if choice[0] == "manual":
+            plan = self._get_plan_for(check.fix_key)
+            if plan:
+                self._show_plan_instructions(plan)
+        else:
+            if check.fix_key == "configure_profile":
+                plan = self._installer.plan_configure_profile_auto()
+            else:
+                plan = self._installer.plan_configure_rt_limits_auto()
+            self._confirm_and_run(check, plan)
+
+    def _confirm_and_run(self, check: EnvironmentCheck, plan: InstallPlan) -> None:
         if plan.is_manual:
-            self._show_plan_instructions(plan, check.fix_key)
+            self._show_plan_instructions(plan)
             return
 
         cmd_text = "\n".join(plan.commands)
         sudo_note = (
-            "\n\nAdministrator privileges (sudo) will be required." if plan.requires_sudo else ""
+            "\n\nAdministrator privileges will be required." if plan.requires_sudo else ""
         )
         logout_note = (
             "\n\nA logout/reboot will be required after this change."
@@ -213,7 +337,7 @@ class SetupDialog(QDialog):
 
         self._active_check_name = check.name
         self._spinner_frame = 0
-        self._refresh()  # rebuilds rows; _make_check_row captures self._spinner_label
+        self._refresh()
 
         self._spinner_timer = QTimer(self)
         self._spinner_timer.timeout.connect(self._tick_spinner)
@@ -239,6 +363,10 @@ class SetupDialog(QDialog):
         self._show_output_dialog(ok, title, output)
         self._refresh()
 
+    # ------------------------------------------------------------------
+    # Dialogs
+    # ------------------------------------------------------------------
+
     def _show_output_dialog(self, ok: bool, title: str, output: str) -> None:
         dlg = QDialog(self)
         dlg.setWindowTitle(f"{'Completed' if ok else 'Failed'}: {title}")
@@ -260,12 +388,7 @@ class SetupDialog(QDialog):
         layout.addWidget(btn)
         dlg.exec()
 
-    def _show_manual_instructions(self, check: EnvironmentCheck) -> None:
-        plan = self._get_plan_for(check.fix_key)
-        if plan:
-            self._show_plan_instructions(plan, check.fix_key)
-
-    def _show_plan_instructions(self, plan: InstallPlan, fix_key: str = "") -> None:
+    def _show_plan_instructions(self, plan: InstallPlan) -> None:
         dlg = QDialog(self)
         dlg.setWindowTitle(f"Instructions: {plan.title}")
         dlg.setMinimumSize(560, 360)
@@ -279,9 +402,8 @@ class SetupDialog(QDialog):
         text.setPlainText(plan.manual_instructions)
         layout.addWidget(text)
         btn_row = QHBoxLayout()
-        if fix_key not in _NO_COPY_KEYS:
-            label = "Copy command" if fix_key in _COPY_SINGULAR_KEYS else "Copy Commands"
-            copy_btn = QPushButton(label)
+        if plan.copyable_commands:
+            copy_btn = QPushButton("Copy Commands")
             clipboard_text = "\n".join(plan.copyable_commands)
             copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(clipboard_text))
             btn_row.addWidget(copy_btn)
