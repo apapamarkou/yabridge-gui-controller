@@ -1,0 +1,16 @@
+Source: yabridge-gui-controller
+Section: sound
+Priority: optional
+Maintainer: Andrianos Papamarkou <andrianos@example.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/apapamarkou/yabridge-gui-controller
+Rules-Requires-Root: no
+
+Package: yabridge-gui-controller
+Architecture: all
+Depends: ${misc:Depends}, python3 (>= 3.10), python3-pyqt6 (>= 6.4), python3-yaml (>= 6.0)
+Description: GUI controller for yabridge — manage Windows VST/VST3 plugins on Linux
+ A GUI controller for yabridge that provides a plugin browser, one-click sync,
+ Pro Audio Setup Assistant, guided remediation, a free plugin browser, and
+ diagnostic reports for troubleshooting.

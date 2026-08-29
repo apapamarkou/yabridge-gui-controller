@@ -18,6 +18,29 @@ make lint   # must pass
 make test   # must pass
 ```
 
+## Packaging
+
+Build all packages:
+
+```bash
+make packages
+```
+
+Build a specific format interactively:
+
+```bash
+make package
+```
+
+Test packages with Docker:
+
+```bash
+make test-packages   # all formats
+make test-package    # interactive
+```
+
+Built packages appear in `packaging/output/`. Distro versions are configured in `packaging/distro-versions.conf`.
+
 ## Adding a free plugin to the database
 
 1. Create `database/plugins/<slug>/`

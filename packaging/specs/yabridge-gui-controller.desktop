@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Yabridge GUI Controller
+Comment=Manage Windows VST/VST3 plugins via yabridge
+Exec=yabridge-gui-controller
+Icon=yabridge-gui-controller
+Categories=AudioVideo;Audio;Settings;
+Terminal=false
+StartupNotify=true
+StartupWMClass=YabridgeGuiController
+Keywords=vst;wine;yabridge;plugins;audio;

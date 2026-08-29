@@ -23,6 +23,7 @@ A Linux desktop application for managing Windows VST/VST3 plugins via [yabridge]
 | Debian | 13 | ✓ Supported |
 | Fedora | 44 | ✓ Supported |
 | Arch Linux | rolling | ✓ Supported |
+| openSUSE | Tumbleweed | ✓ Supported |
 | Other | — | Manual instructions |
 
 ---
@@ -47,6 +48,12 @@ sudo apt install python3-pyqt6 python3-yaml
 sudo dnf install python3-PyQt6 python3-pyyaml
 ```
 
+#### openSUSE
+
+```bash
+sudo zypper install python3-qt6 python3-yaml
+```
+
 #### Arch
 
 ```bash
@@ -67,10 +74,10 @@ Download from the [Releases](https://github.com/apapamarkou/yabridge-gui-control
 
 | Format | Command |
 |---|---|
-| `.deb` | `sudo dpkg -i yabridge-gui-controller-*.deb` |
+| `.deb` | `sudo dpkg -i yabridge-gui-controller_*.deb` |
 | `.rpm` | `sudo rpm -i yabridge-gui-controller-*.rpm` |
 | `.AppImage` | `chmod +x *.AppImage && ./*.AppImage` |
-| `.tar.gz` | `tar -xzf *.tar.gz && cd yabridge-gui-controller-* && ./install.sh` |
+| `.tar.gz` | `tar -xzf *.tar.gz && cd yabridge-gui-controller-* && ./install` |
 
 ---
 
@@ -78,11 +85,11 @@ Download from the [Releases](https://github.com/apapamarkou/yabridge-gui-control
 
 If you need to set up Wine and yabridge from scratch, use the **Setup Assistant** inside the application, or follow the manual instructions for your distribution:
 
-- [Ubuntu 26.04](ubuntu2604.md)
-- [Debian 13](debian13.md)
-- [Fedora 44](fedora44.md)
-- [Arch Linux](arch.md)
-- [Other distributions](others.md)
+- [Ubuntu 26.04](docs/distros/Ubuntu26.04.md)
+- [Debian 13](docs/distros/Debian13.md)
+- [Fedora 44](docs/distros/Fedora44.md)
+- [Arch Linux](docs/distros/Arch.md)
+- [Other distributions](docs/LinuxProAudioSetup.md)
 
 ---
 
@@ -160,13 +167,15 @@ Tests are in `tests/unit/` and `tests/integration/`. GUI tests are minimal and f
 ## Packaging
 
 ```bash
-make package       # interactive — select format
-make packages      # build deb + tarball (rpm/AppImage require extra tools)
+make package       # interactive — select format and distro version
+make packages      # build all formats non-interactively
 make test-package  # interactive — test a package format
 make test-packages # test all formats (requires Docker)
 ```
 
-Built packages appear in `dist/`.
+Built packages appear in `packaging/output/`.
+
+Package formats: `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE), `.pkg.tar.zst` (Arch), `.AppImage`, `.tar.gz` binary tarball, source tarball.
 
 **Note:** Package tests use Docker containers for installation validation only. Real-world release validation is performed manually in VMs before any release is published.
 
