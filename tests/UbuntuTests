@@ -1,2 +1,15 @@
+<memoryBacking>
+  <access mode="shared"/>
+</memoryBacking>
+
+add filesystem
+Driver: virtiofs
+Source path: π.χ. /home/username/vm-share
+Target path: vmshare
+
+sudo mkdir -p /mnt/vmshare
+
+sudo mount -t virtiofs vmshare /mnt/vmshare
+
 sudo apt update
 sudo apt install python3-pyqt6 curl
