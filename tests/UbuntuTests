@@ -2,14 +2,18 @@
   <access mode="shared"/>
 </memoryBacking>
 
+git clone -b refactor/professionalize-project <https://github.com/apapamarkou/yabridge-gui-controller.git>
+cd yabridge-gui-controller
+make run
+
 add filesystem
 Driver: virtiofs
 Source path: π.χ. /home/username/vm-share
 Target path: vmshare
 
-sudo mkdir -p /mnt/vmshare
+sudo mkdir -p /mnt/yabridgeGUIControllerShare
 
-sudo mount -t virtiofs vmshare /mnt/vmshare
+sudo mount -t virtiofs vmshare /mnt/yabridgeGUIControllerShare
 
 sudo apt update
 sudo apt install python3-pyqt6 curl
