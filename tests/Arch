@@ -2,7 +2,7 @@
   <access mode="shared"/>
 </memoryBacking>
 
-sudo packman -S --needed git
+sudo pacman -S --needed git spice-vdagent
 
 git clone -b refactor/professionalize-project <https://github.com/apapamarkou/yabridge-gui-controller.git>
 cd yabridge-gui-controller
@@ -17,7 +17,4 @@ sudo mkdir -p /mnt/yabridgeGUIControllerShare
 
 sudo mount -t virtiofs vmshare /mnt/yabridgeGUIControllerShare
 
-sudo packman -S --needed libfuse2t64
-
-sudo apt update
-sudo apt install python3-pyqt6 curl
+sudo pacman -S --needed fuse2

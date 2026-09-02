@@ -444,6 +444,35 @@ class DnfInstaller(BaseInstaller):
 class PacmanInstaller(BaseInstaller):
     """Installer for Arch Linux."""
 
+    def plan_enable_multilib(self) -> InstallPlan:
+        script = (
+            "import re, sys\n"
+            "path = '/etc/pacman.conf'\n"
+            "text = open(path).read()\n"
+            "# Uncomment existing [multilib] block\n"
+            "text = re.sub(r'#\\s*(\\[multilib\\])', r'\\1', text)\n"
+            "text = re.sub(r'#\\s*(Include = /etc/pacman\\.d/mirrorlist)', r'\\1', text)\n"
+            "# Add block if missing\n"
+            "if '[multilib]' not in text:\n"
+            "    text += '\\n[multilib]\\nInclude = /etc/pacman.d/mirrorlist\\n'\n"
+            "open(path, 'w').write(text)\n"
+        )
+        return InstallPlan(
+            title="Enable multilib repository",
+            commands=[f'pkexec python3 -c "{script}"', "sudo pacman -Sy"],
+            requires_sudo=True,
+        )
+
+    def plan_install_wine_full(self) -> InstallPlan:
+        multilib = self.plan_enable_multilib()
+        deps = self.plan_install_wine_deps()
+        tarball = self.plan_install_wine_tarball()
+        return InstallPlan(
+            title="Install Wine Staging (full)",
+            commands=multilib.commands + deps.commands + tarball.commands,
+            requires_sudo=True,
+        )
+
     def plan_install_wine_deps(self) -> InstallPlan:
         pkgs = (
             "glibc lib32-glibc cabextract curl wget freetype2 lib32-freetype2 "
