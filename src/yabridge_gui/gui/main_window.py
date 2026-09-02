@@ -199,6 +199,7 @@ class MainWindow(QMainWindow):
         from yabridge_gui.gui.setup_dialog import SetupDialog
 
         dlg = SetupDialog(self)
+        dlg.finished.connect(self._check_environment)
         dlg.exec()
 
     def _open_free_plugins(self) -> None:

@@ -45,6 +45,7 @@ gtk-update-icon-cache -f -t %{_datadir}/icons/hicolor &>/dev/null || :
 %license LICENSE
 %doc README.md
 %{_bindir}/yabridge-gui-controller
+%{_bindir}/yabridge-gui-controller-gui
 %{python3_sitelib}/yabridge_gui/
 %{python3_sitelib}/yabridge_gui_controller-*.dist-info/
 %{_datadir}/icons/hicolor/256x256/apps/yabridge-gui-controller.png

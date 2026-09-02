@@ -146,32 +146,58 @@ def check_audio_group() -> EnvironmentCheck:
         )
 
 
-def check_realtime_limits() -> EnvironmentCheck:
+def _read_proc_limits() -> dict[str, str]:
+    result: dict[str, str] = {}
+    try:
+        for line in Path("/proc/self/limits").read_text().splitlines():
+            if line.startswith("Max realtime priority"):
+                result["rtprio"] = line.split()[-1]
+            elif line.startswith("Max nice priority"):
+                result["nice"] = line.split()[-1]
+            elif line.startswith("Max locked memory"):
+                parts = line.split()
+                result["memlock"] = parts[-2]
+    except OSError:
+        pass
+    return result
+
+
+def _limits_conf_has_audio_limits() -> bool:
     limits_file = Path("/etc/security/limits.conf")
     if not limits_file.exists():
-        return EnvironmentCheck(
-            "rt_limits", "Realtime limits", CheckStatus.UNKNOWN, "/etc/security/limits.conf missing"
-        )
+        return False
     content = limits_file.read_text()
-    has_rtprio = "@audio" in content and "rtprio" in content
-    has_memlock = "@audio" in content and "memlock" in content
-    has_nice = "@audio" in content and "nice" in content
-    if has_rtprio and has_memlock and has_nice:
+    return "@audio" in content and "rtprio" in content and "memlock" in content
+
+
+def check_realtime_limits() -> EnvironmentCheck:
+    proc = _read_proc_limits()
+    rtprio_ok = int(proc.get("rtprio", "0") or "0") >= 95
+    nice_ok = int(proc.get("nice", "0") or "0") >= 10
+    memlock_ok = proc.get("memlock", "") == "unlimited"
+
+    if rtprio_ok and nice_ok and memlock_ok:
         return EnvironmentCheck(
-            "rt_limits", "Realtime limits", CheckStatus.OK, "rtprio + memlock + nice configured"
+            "rt_limits", "Realtime limits", CheckStatus.OK, "rtprio + memlock + nice active"
         )
-    missing = [
-        x
-        for x, ok in [("rtprio", has_rtprio), ("memlock", has_memlock), ("nice", has_nice)]
-        if not ok
-    ]
+
+    problems = []
+    if not rtprio_ok:
+        problems.append(f"rtprio={proc.get('rtprio', '?')} (need ≥95)")
+    if not nice_ok:
+        problems.append(f"nice={proc.get('nice', '?')} (need ≥10)")
+    if not memlock_ok:
+        problems.append(f"memlock={proc.get('memlock', '?')} (need unlimited)")
+
+    configured = _limits_conf_has_audio_limits()
     return EnvironmentCheck(
         "rt_limits",
         "Realtime limits",
         CheckStatus.WARNING,
-        f"Missing @audio {', '.join(missing)} in /etc/security/limits.conf",
-        fix_available=True,
-        fix_key="configure_rt_limits",
+        ", ".join(problems),
+        fix_available=not configured,
+        fix_key="" if configured else "configure_rt_limits",
+        logout_warning="Restart required for realtime limit changes to take effect." if configured else "",
     )
 
 
