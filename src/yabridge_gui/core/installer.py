@@ -309,13 +309,12 @@ class BaseInstaller(ABC):
         sudo_cmds: list[str] = []
         other_cmds: list[str] = []
         for cmd_str in plan.commands:
-            parts = (
-                _parse_cmd(cmd_str)
-                if not ("\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|", "$")))
-                else []
-            )
+            has_shell_ops = "\n" in cmd_str or any(op in cmd_str for op in ("<<", "&&", "|", "$"))
+            parts = [] if has_shell_ops else _parse_cmd(cmd_str)
             if parts and parts[0] == "sudo":
                 sudo_cmds.append(" ".join(parts[1:]))
+            elif has_shell_ops and cmd_str.lstrip().startswith("sudo "):
+                sudo_cmds.append(cmd_str.lstrip()[len("sudo ") :])
             else:
                 other_cmds.append(cmd_str)
 
@@ -445,21 +444,21 @@ class PacmanInstaller(BaseInstaller):
     """Installer for Arch Linux."""
 
     def plan_enable_multilib(self) -> InstallPlan:
-        script = (
-            "import re, sys\n"
-            "path = '/etc/pacman.conf'\n"
-            "text = open(path).read()\n"
-            "# Uncomment existing [multilib] block\n"
-            "text = re.sub(r'#\\s*(\\[multilib\\])', r'\\1', text)\n"
-            "text = re.sub(r'#\\s*(Include = /etc/pacman\\.d/mirrorlist)', r'\\1', text)\n"
-            "# Add block if missing\n"
-            "if '[multilib]' not in text:\n"
-            "    text += '\\n[multilib]\\nInclude = /etc/pacman.d/mirrorlist\\n'\n"
-            "open(path, 'w').write(text)\n"
+        # If already uncommented: do nothing.
+        # If commented out: uncomment it.
+        # If absent entirely: append it.
+        cmd = (
+            "grep -q '^\\[multilib\\]' /etc/pacman.conf || "
+            "{ grep -q '^#\\[multilib\\]' /etc/pacman.conf && "
+            "sed -i '/^#\\[multilib\\]/{s/^#//;n;s/^#//}' /etc/pacman.conf || "
+            "printf '\\n[multilib]\\nInclude = /etc/pacman.d/mirrorlist\\n' >> /etc/pacman.conf; }"
         )
         return InstallPlan(
             title="Enable multilib repository",
-            commands=[f'pkexec python3 -c "{script}"', "sudo pacman -Sy"],
+            commands=[
+                f'sudo bash -c "{cmd}"',
+                "sudo pacman -Sy --noconfirm",
+            ],
             requires_sudo=True,
         )
 
@@ -484,8 +483,8 @@ class PacmanInstaller(BaseInstaller):
         return InstallPlan(
             title="Install Wine dependencies",
             commands=[
-                "sudo pacman -S --needed multilib-devel",
-                f"sudo pacman -S --needed {pkgs}",
+                "sudo pacman -S --needed --noconfirm multilib-devel",
+                f"sudo pacman -S --needed --noconfirm {pkgs}",
             ],
             requires_sudo=True,
         )
@@ -502,7 +501,7 @@ class PacmanInstaller(BaseInstaller):
     def plan_install_qpwgraph(self) -> InstallPlan:
         return InstallPlan(
             title="Install qpwgraph",
-            commands=["sudo pacman -S --needed qpwgraph"],
+            commands=["sudo pacman -S --needed --noconfirm qpwgraph"],
             requires_sudo=True,
         )
 
