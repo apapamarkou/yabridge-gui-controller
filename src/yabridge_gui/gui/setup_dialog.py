@@ -280,7 +280,7 @@ class SetupDialog(QDialog):
 
         dlg = QDialog(self)
         dlg.setWindowTitle(f"Fix: {check.label}")
-        dlg.setMinimumWidth(420)
+        dlg.setFixedSize(640, 420)
         layout = QVBoxLayout(dlg)
 
         info = QLabel(
@@ -373,7 +373,7 @@ class SetupDialog(QDialog):
     def _show_output_dialog(self, ok: bool, title: str, output: str) -> None:
         dlg = QDialog(self)
         dlg.setWindowTitle(f"{'Completed' if ok else 'Failed'}: {title}")
-        dlg.setMinimumSize(600, 400)
+        dlg.setFixedSize(640, 420)
         layout = QVBoxLayout(dlg)
         status_lbl = QLabel(
             "<b style='color:green'>Completed successfully.</b>"
@@ -394,7 +394,7 @@ class SetupDialog(QDialog):
     def _show_plan_instructions(self, plan: InstallPlan) -> None:
         dlg = QDialog(self)
         dlg.setWindowTitle(f"Instructions: {plan.title}")
-        dlg.setMinimumSize(560, 360)
+        dlg.setFixedSize(640, 420)
         layout = QVBoxLayout(dlg)
         layout.addWidget(
             QLabel("<b>Manual action required</b> — copy the commands below into a terminal.")
@@ -443,6 +443,8 @@ class SetupDialog(QDialog):
                     commands=["systemctl --user --now enable wireplumber.service"],
                     requires_sudo=False,
                 )
+            case "install_wireplumber":
+                return self._installer.plan_install_pipewire_jack()
             case _:
                 return None
 
@@ -450,7 +452,7 @@ class SetupDialog(QDialog):
         report = generate_diagnostic_report()
         dlg = QDialog(self)
         dlg.setWindowTitle("Diagnostic Report")
-        dlg.setMinimumSize(600, 400)
+        dlg.setFixedSize(640, 420)
         layout = QVBoxLayout(dlg)
         text = QTextEdit()
         text.setReadOnly(True)

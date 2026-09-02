@@ -15,8 +15,6 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QPushButton,
-    QSizePolicy,
-    QSpacerItem,
     QVBoxLayout,
     QWidget,
 )
@@ -61,9 +59,14 @@ class MainWindow(QMainWindow):
 
         self.scan_button = QPushButton("Scan")
         self.scan_button.clicked.connect(self._scan_plugins)
+        self.scan_button.setFixedHeight(40)
+        font = self.scan_button.font()
+        font.setPointSize(font.pointSize() + 2)
+        font.setBold(True)
+        self.scan_button.setFont(font)
 
-        setup_button = QPushButton("Setup Assistant")
-        setup_button.clicked.connect(self._open_setup)
+        self.setup_button = QPushButton("Setup Assistant")
+        self.setup_button.clicked.connect(self._open_setup)
 
         free_plugins_button = QPushButton("Free Plugins")
         free_plugins_button.clicked.connect(self._open_free_plugins)
@@ -73,15 +76,6 @@ class MainWindow(QMainWindow):
 
         quit_button = QPushButton("Quit")
         quit_button.clicked.connect(self.close)
-
-        button_layout = QHBoxLayout()
-        spacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        button_layout.addItem(spacer)
-        button_layout.addWidget(self.scan_button)
-        button_layout.addWidget(setup_button)
-        button_layout.addWidget(free_plugins_button)
-        button_layout.addWidget(about_button)
-        button_layout.addWidget(quit_button)
 
         layout = QVBoxLayout()
         title = QLabel("<h2>Converted Plugins</h2><hr/>")
@@ -100,12 +94,21 @@ class MainWindow(QMainWindow):
         list_layout.addLayout(vst3_layout)
         layout.addLayout(list_layout)
 
-        self.yabridge_status = QLabel()
-        self.wine_status = QLabel()
-        status_layout = QVBoxLayout()
-        status_layout.addWidget(self.yabridge_status)
-        status_layout.addWidget(self.wine_status)
-        layout.addLayout(status_layout)
+        # Scan row
+        scan_layout = QHBoxLayout()
+        scan_label = QLabel("Scan and convert new installed plugins")
+        scan_layout.addWidget(scan_label)
+        scan_layout.addStretch()
+        scan_layout.addWidget(self.scan_button)
+        layout.addLayout(scan_layout)
+
+        # Bottom button row
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.setup_button)
+        button_layout.addWidget(free_plugins_button)
+        button_layout.addWidget(about_button)
+        button_layout.addStretch()
+        button_layout.addWidget(quit_button)
         layout.addLayout(button_layout)
 
         container = QWidget()
@@ -118,22 +121,13 @@ class MainWindow(QMainWindow):
 
     def _check_environment(self) -> None:
         yabridgectl_ver = get_yabridgectl_version()
-        if yabridgectl_ver:
-            self.yabridge_status.setText(f"Yabridge: Installed ({yabridgectl_ver})")
-            self.yabridge_status.setStyleSheet("color: green;")
-        else:
-            self.yabridge_status.setText("Yabridge: Not Installed")
-            self.yabridge_status.setStyleSheet("color: red;")
-
         wine_ver = get_wine_version()
-        if wine_ver:
-            self.wine_status.setText(f"Wine: Installed ({wine_ver})")
-            self.wine_status.setStyleSheet("color: green;")
+        all_ok = bool(yabridgectl_ver) and bool(wine_ver)
+        self.scan_button.setEnabled(all_ok)
+        if not all_ok:
+            self.setup_button.setStyleSheet("color: red; font-weight: bold;")
         else:
-            self.wine_status.setText("Wine: Not Installed")
-            self.wine_status.setStyleSheet("color: red;")
-
-        self.scan_button.setEnabled(bool(yabridgectl_ver) and bool(wine_ver))
+            self.setup_button.setStyleSheet("")
 
     # ------------------------------------------------------------------
     # Plugin loading (preserved from original)

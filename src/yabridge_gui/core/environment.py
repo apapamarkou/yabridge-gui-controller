@@ -178,7 +178,8 @@ def check_realtime_limits() -> EnvironmentCheck:
 def check_pipewire() -> EnvironmentCheck:
     ok, ver = _command_version("pipewire")
     if not ok:
-        return EnvironmentCheck("pipewire", "PipeWire", CheckStatus.MISSING, "pipewire not found")
+        return EnvironmentCheck("pipewire", "PipeWire", CheckStatus.MISSING, "pipewire not found",
+                                 fix_available=True, fix_key="install_pipewire_jack")
     # Check JACK compatibility
     jack_ok, _ = _run(["pw-jack", "--version"])
     if jack_ok:
@@ -207,7 +208,8 @@ def check_wireplumber() -> EnvironmentCheck:
             fix_available=True,
             fix_key="enable_wireplumber",
         )
-    return EnvironmentCheck("wireplumber", "WirePlumber", CheckStatus.MISSING, "Not found")
+    return EnvironmentCheck("wireplumber", "WirePlumber", CheckStatus.MISSING, "Not found",
+                             fix_available=True, fix_key="install_wireplumber")
 
 
 def check_vst_dirs() -> EnvironmentCheck:
