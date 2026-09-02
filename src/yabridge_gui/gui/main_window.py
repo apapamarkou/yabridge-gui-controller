@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
 )
 
 from yabridge_gui import __version__
+from yabridge_gui.core.environment import CheckStatus, run_environment_checks
 from yabridge_gui.core.wine import get_wine_version
 from yabridge_gui.core.yabridge import (
     SyncResult,
@@ -122,12 +123,10 @@ class MainWindow(QMainWindow):
     def _check_environment(self) -> None:
         yabridgectl_ver = get_yabridgectl_version()
         wine_ver = get_wine_version()
-        all_ok = bool(yabridgectl_ver) and bool(wine_ver)
-        self.scan_button.setEnabled(all_ok)
-        if not all_ok:
-            self.setup_button.setStyleSheet("color: red; font-weight: bold;")
-        else:
-            self.setup_button.setStyleSheet("")
+        self.scan_button.setEnabled(bool(yabridgectl_ver) and bool(wine_ver))
+        checks = run_environment_checks()
+        all_ok = all(c.status == CheckStatus.OK for c in checks)
+        self.setup_button.setStyleSheet("" if all_ok else "color: red; font-weight: bold;")
 
     # ------------------------------------------------------------------
     # Plugin loading (preserved from original)
