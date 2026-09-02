@@ -171,6 +171,7 @@ class BaseInstaller(ABC):
                 f"wget -O /tmp/winetricks {winetricks_url}",
                 "chmod +x /tmp/winetricks",
                 "/tmp/winetricks vcrun6sp6",
+                'wine reg add "HKCU\\Control Panel\\Desktop" /v LogPixels /t REG_DWORD /d 125 /f',
                 "winecfg",
             ],
             requires_sudo=False,

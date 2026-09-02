@@ -197,15 +197,23 @@ def check_realtime_limits() -> EnvironmentCheck:
         ", ".join(problems),
         fix_available=not configured,
         fix_key="" if configured else "configure_rt_limits",
-        logout_warning="Restart required for realtime limit changes to take effect." if configured else "",
+        logout_warning="Restart required for realtime limit changes to take effect."
+        if configured
+        else "",
     )
 
 
 def check_pipewire() -> EnvironmentCheck:
     ok, ver = _command_version("pipewire")
     if not ok:
-        return EnvironmentCheck("pipewire", "PipeWire", CheckStatus.MISSING, "pipewire not found",
-                                 fix_available=True, fix_key="install_pipewire_jack")
+        return EnvironmentCheck(
+            "pipewire",
+            "PipeWire",
+            CheckStatus.MISSING,
+            "pipewire not found",
+            fix_available=True,
+            fix_key="install_pipewire_jack",
+        )
     # Check JACK compatibility
     jack_ok, _ = _run(["pw-jack", "--version"])
     if jack_ok:
@@ -234,8 +242,14 @@ def check_wireplumber() -> EnvironmentCheck:
             fix_available=True,
             fix_key="enable_wireplumber",
         )
-    return EnvironmentCheck("wireplumber", "WirePlumber", CheckStatus.MISSING, "Not found",
-                             fix_available=True, fix_key="install_wireplumber")
+    return EnvironmentCheck(
+        "wireplumber",
+        "WirePlumber",
+        CheckStatus.MISSING,
+        "Not found",
+        fix_available=True,
+        fix_key="install_wireplumber",
+    )
 
 
 def check_vst_dirs() -> EnvironmentCheck:

@@ -324,20 +324,28 @@ class SetupDialog(QDialog):
             return
 
         cmd_text = "\n".join(plan.commands)
-        sudo_note = "\n\nAdministrator privileges will be required." if plan.requires_sudo else ""
+        sudo_note = "\nAdministrator privileges will be required." if plan.requires_sudo else ""
         logout_note = (
-            "\n\nA logout/reboot will be required after this change."
-            if plan.requires_logout
-            else ""
+            "\nA logout/reboot will be required after this change." if plan.requires_logout else ""
         )
 
-        msg = QMessageBox(self)
-        msg.setWindowTitle(f"Confirm: {plan.title}")
-        msg.setText(
-            f"The following actions will be performed:\n\n{cmd_text}{sudo_note}{logout_note}\n\nContinue?"
+        dlg = QDialog(self)
+        dlg.setWindowTitle(f"Confirm: {plan.title}")
+        dlg.setFixedSize(640, 420)
+        layout = QVBoxLayout(dlg)
+        layout.addWidget(QLabel("<b>The following actions will be performed:</b>"))
+        text = QTextEdit()
+        text.setReadOnly(True)
+        text.setFontFamily("monospace")
+        text.setPlainText(f"{cmd_text}{sudo_note}{logout_note}")
+        layout.addWidget(text)
+        btn = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
-        msg.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
-        if msg.exec() != QMessageBox.StandardButton.Ok:
+        btn.accepted.connect(dlg.accept)
+        btn.rejected.connect(dlg.reject)
+        layout.addWidget(btn)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
             return
 
         self._active_check_name = check.name

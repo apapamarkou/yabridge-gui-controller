@@ -1,4 +1,4 @@
-.PHONY: run test lint lint-fix install uninstall venv clean \
+.PHONY: run test lint lint-fix format install uninstall venv clean \
         packages package test-packages test-package test-appimage help
 
 PYTHON := python3
@@ -44,6 +44,9 @@ lint-fix:
 	$(RUFF) check --fix src/ tests/
 	$(RUFF) format src/ tests/
 
+format:
+	$(RUFF) format src/ tests/
+
 packages:
 	bash packaging/scripts/packages.sh
 
@@ -76,6 +79,7 @@ help:
 	@echo "  make test           Run test suite"
 	@echo "  make lint           Lint and format check"
 	@echo "  make lint-fix       Auto-fix lint issues"
+	@echo "  make format         Format code"
 	@echo "  make packages       Build all package formats (non-interactive)"
 	@echo "  make package        Interactively select and build a package"
 	@echo "  make test-packages  Test all packages with Docker"

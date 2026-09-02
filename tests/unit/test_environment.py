@@ -32,20 +32,24 @@ def test_check_vst_dirs_missing(tmp_path):
 
 
 def test_check_realtime_limits_ok():
+    proc_limits = (
+        "Max realtime priority     95                   95                   \n"
+        "Max nice priority         30                   30                   \n"
+        "Max locked memory         unlimited            unlimited            bytes\n"
+    )
     with patch("yabridge_gui.core.environment.Path") as mock_path:
-        mock_path.return_value.exists.return_value = True
-        mock_path.return_value.read_text.return_value = (
-            "@audio - rtprio 95\n@audio - memlock unlimited\n@audio - nice 10\n"
-        )
+        mock_path.return_value.read_text.return_value = proc_limits
         result = check_realtime_limits()
     assert result.status == CheckStatus.OK
 
 
 def test_check_realtime_limits_missing_file():
     with patch("yabridge_gui.core.environment.Path") as mock_path:
+        mock_path.return_value.read_text.side_effect = OSError
         mock_path.return_value.exists.return_value = False
         result = check_realtime_limits()
-    assert result.status == CheckStatus.UNKNOWN
+    assert result.status == CheckStatus.WARNING
+    assert result.fix_key == "configure_rt_limits"
 
 
 def test_check_profile_paths_ok(tmp_path):
