@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y python3-pyqt6 libxcb-cursor0 libxcb-xinerama0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+            libxcb-render-util0 libxcb-shape0 xvfb
+
+      - name: Install project
+        run: |
+          pip install --upgrade pip
+          pip install ".[dev]" || pip install -e "." && pip install pytest ruff pyyaml
+
+      - name: Lint (ruff)
+        run: ruff check src/ tests/
+
+      - name: Format check (ruff)
+        run: ruff format --check src/ tests/
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v --tb=short
+
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build tools
+        run: pip install build setuptools setuptools-scm
+
+      - name: Build sdist and wheel
+        run: python -m build --sdist --wheel --outdir dist/
+
+      - name: Verify dist artifacts exist
+        run: |
+          ls -la dist/
+          test -n "$(ls dist/*.whl 2>/dev/null)" || (echo "No wheel found" && exit 1)
+          test -n "$(ls dist/*.tar.gz 2>/dev/null)" || (echo "No sdist found" && exit 1)

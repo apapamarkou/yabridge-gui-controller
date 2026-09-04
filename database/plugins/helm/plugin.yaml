@@ -1,0 +1,16 @@
+name: Helm
+developer: Matt Tytel
+description: >
+  Free polyphonic synthesizer with a clean interface. Features subtractive
+  synthesis, LFOs, envelopes, and a built-in arpeggiator.
+category: Synthesizer
+website: https://tytel.org/helm/
+download: https://github.com/mtytel/helm/releases
+formats:
+  - VST2
+  - VST3
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true

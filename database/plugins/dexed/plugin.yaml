@@ -1,0 +1,16 @@
+name: Dexed
+developer: Digital Suburban
+description: >
+  FM synthesizer closely modeled on the Yamaha DX7. Compatible with DX7 patches.
+  Excellent for classic FM sounds and electric pianos.
+category: Synthesizer
+website: https://asb2m10.github.io/dexed/
+download: https://github.com/asb2m10/dexed/releases
+formats:
+  - VST3
+  - VST2
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true

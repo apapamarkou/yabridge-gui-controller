@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=42", "setuptools-scm>=6"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yabridge-gui-controller"
+dynamic = ["version"]
+description = "A GUI controller for yabridge — manage Windows VST/VST3 plugins on Linux"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Andrianos Papamarkou" }]
+requires-python = ">=3.10"
+dependencies = [
+    "PyQt6>=6.4",
+    "PyYAML>=6.0",
+]
+keywords = ["yabridge", "vst", "wine", "audio", "linux", "plugins"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+
+[project.urls]
+Homepage = "https://github.com/apapamarkou/yabridge-gui-controller"
+Repository = "https://github.com/apapamarkou/yabridge-gui-controller"
+Issues = "https://github.com/apapamarkou/yabridge-gui-controller/issues"
+
+[project.scripts]
+yabridge-gui-controller = "yabridge_gui.__main__:main"
+
+[project.gui-scripts]
+yabridge-gui-controller-gui = "yabridge_gui.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+yabridge_gui = ["assets/*"]
+
+[tool.setuptools_scm]
+write_to = "src/yabridge_gui/_version.py"
+fallback_version = "2.0.0"
+
+[tool.ruff]
+src = ["src"]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["yabridge_gui"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true

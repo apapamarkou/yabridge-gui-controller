@@ -1,0 +1,16 @@
+name: Odin 2
+developer: TheWaveWarden
+description: >
+  Semi-modular synthesizer with a wide range of oscillator types including
+  wavetable, PM, and FM. Features a flexible modulation matrix.
+category: Synthesizer
+website: https://www.thewavewarden.com/odin2
+download: https://github.com/TheWaveWarden/odin2/releases
+formats:
+  - VST3
+  - VST2
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true

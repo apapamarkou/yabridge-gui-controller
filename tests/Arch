@@ -1,0 +1,20 @@
+<memoryBacking>
+  <access mode="shared"/>
+</memoryBacking>
+
+sudo pacman -S --needed git spice-vdagent
+
+git clone -b refactor/professionalize-project <https://github.com/apapamarkou/yabridge-gui-controller.git>
+cd yabridge-gui-controller
+make run
+
+add filesystem
+Driver: virtiofs
+Source path: π.χ. /home/username/vm-share
+Target path: vmshare
+
+sudo mkdir -p /mnt/yabridgeGUIControllerShare
+
+sudo mount -t virtiofs vmshare /mnt/yabridgeGUIControllerShare
+
+sudo pacman -S --needed fuse2
