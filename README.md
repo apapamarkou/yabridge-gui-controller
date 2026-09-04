@@ -18,12 +18,11 @@ A Linux desktop application for managing Windows VST/VST3 plugins via [yabridge]
 ## Supported Distributions
 
 | Distribution | Version | Status |
-|---|---|---|
+| --- | --- | --- |
 | Ubuntu | 26.04 | ✓ Supported |
 | Debian | 13 | ✓ Supported |
 | Fedora | 44 | ✓ Supported |
 | Arch Linux | rolling | ✓ Supported |
-| openSUSE | Tumbleweed | ✓ Supported |
 | Other | — | Manual instructions |
 
 ---
@@ -73,7 +72,7 @@ make install
 Download from the [Releases](https://github.com/apapamarkou/yabridge-gui-controller/releases) page:
 
 | Format | Command |
-|---|---|
+| --- | --- |
 | `.deb` | `sudo dpkg -i yabridge-gui-controller_*.deb` |
 | `.rpm` | `sudo rpm -i yabridge-gui-controller-*.rpm` |
 | `.AppImage` | `chmod +x *.AppImage && ./*.AppImage` |
