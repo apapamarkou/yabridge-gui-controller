@@ -2,7 +2,10 @@
 
 A Linux desktop application for managing Windows VST/VST3 plugins via [yabridge](https://github.com/robbert-vdh/yabridge) and Wine.
 
----
+| Main Window | Setup Guide |
+| --- | --- |
+| ![Screenshot](docs/screenshots/YGC01.png) | ![Screenshot](docs/screenshots/YGC02.png) |
+| ![Screenshot](docs/screenshots/YGC03.png) | ![Screenshot](docs/screenshots/YGC04.png) |
 
 ## Features
 
