@@ -1,0 +1,14 @@
+name: Ardour
+developer: Matt Tytel
+description: >
+  Ardour is a free/open-source digital audio workstation for Windows, Linux, and macOS. Produce beats, record live music, track vocals, and mix for streaming.
+category: DAW
+website: https://ardour.org/
+download: https://community.ardour.org/download
+formats:
+  - application
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true

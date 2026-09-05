@@ -17,8 +17,8 @@ class PluginDatabase:
             # Locate database/ relative to the package or project root
             here = Path(__file__).parent
             for candidate in [
-                here.parent.parent.parent / "database/plugins",
-                Path("/usr/share/yabridge-gui-controller/database/plugins"),
+                here.parent.parent.parent / "database/software",
+                Path("/usr/share/yabridge-gui-controller/database/software"),
             ]:
                 if candidate.exists():
                     db_root = candidate

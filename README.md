@@ -5,6 +5,7 @@ A Linux desktop application for managing Windows VST/VST3 plugins via [yabridge]
 | Main Window | Setup Guide |
 | --- | --- |
 | ![Screenshot](docs/screenshots/YGC01.png) | ![Screenshot](docs/screenshots/YGC02.png) |
+| Report | Free Software Browser |
 | ![Screenshot](docs/screenshots/YGC03.png) | ![Screenshot](docs/screenshots/YGC04.png) |
 
 ## Features
@@ -13,7 +14,7 @@ A Linux desktop application for managing Windows VST/VST3 plugins via [yabridge]
 - **One-click sync** — runs `yabridgectl sync` with a progress dialog
 - **Pro Audio Setup Assistant** — detects your environment and guides you through setup
 - **Guided remediation** — shows what is missing and offers safe automatic fixes
-- **Free Plugin Browser** — browse a curated database of free Windows VST plugins
+- **Audio Apps Browser** — browse a curated database of free Windows VST plugins
 - **Diagnostic report** — generate a system report for troubleshooting
 
 ---
@@ -107,24 +108,24 @@ yabridge-gui-controller
 
 - **Scan** — sync plugins with `yabridgectl sync` and refresh the plugin lists
 - **Setup Assistant** — check your pro-audio environment and fix issues
-- **Free Plugins** — browse free Windows VST plugins
+- **Audio Apps Browser** — browse free Windows VST plugins
 - **About** — application information
 
 ---
 
-## Free Plugin Browser
+## Audio Apps Browser
 
 The application includes a curated database of free Windows VST plugins. Each entry includes name, developer, category, description, formats, and links to the website and download page.
 
 To add a plugin to the database:
 
 ```bash
-mkdir database/plugins/my-plugin
-# create database/plugins/my-plugin/plugin.yaml
-# optionally add database/plugins/my-plugin/image.png
+mkdir database/software/my-plugin
+# create database/software/my-plugin/plugin.yaml
+# optionally add database/software/my-plugin/image.png
 ```
 
-See existing entries in `database/plugins/` for the YAML format.
+See existing entries in `database/software/` for the YAML format.
 
 ---
 

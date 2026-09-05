@@ -44,7 +44,7 @@ from yabridge_gui.services.plugin_database import PluginDatabase
 class FreePluginsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Free Plugin Browser")
+        self.setWindowTitle("Audio Apps Browser")
         self.setMinimumSize(800, 550)
         self._db = PluginDatabase()
         self._plugins: list[FreePlugin] = []

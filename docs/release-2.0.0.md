@@ -2,7 +2,7 @@
 
 ## Overview
 
-Version 2.0.0 is a major refactor of Yabridge GUI Controller, transforming it from a single-script prototype into a professionally structured Python application with a full packaging pipeline, automated setup assistant, guided remediation, and a curated free plugin browser.
+Version 2.0.0 is a major refactor of Yabridge GUI Controller, transforming it from a single-script prototype into a professionally structured Python application with a full packaging pipeline, automated setup assistant, guided remediation, and a curated audio apps browser.
 
 ---
 
@@ -72,9 +72,9 @@ wine reg add "HKCU\Control Panel\Desktop" /v LogPixels /t REG_DWORD /d 125 /f
 winecfg
 ```
 
-### Free Plugin Browser
+### Audio Apps Browser
 
-- Curated YAML database under `database/plugins/`
+- Curated YAML database under `database/software/`
 - Each entry: name, developer, category, description, formats, website, download link, optional image
 - Searchable and filterable by category inside the application
 

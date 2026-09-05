@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         self.setup_button = QPushButton("Setup Assistant")
         self.setup_button.clicked.connect(self._open_setup)
 
-        free_plugins_button = QPushButton("Free Plugins")
+        free_plugins_button = QPushButton("Audio Apps Browser")
         free_plugins_button.clicked.connect(self._open_free_plugins)
 
         about_button = QPushButton("About")

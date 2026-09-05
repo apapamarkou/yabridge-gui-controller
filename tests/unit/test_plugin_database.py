@@ -41,9 +41,9 @@ def test_plugin_database_loads_real_db():
     """Test that the real database directory loads without errors."""
     from pathlib import Path
 
-    db_root = Path(__file__).parent.parent.parent / "database/plugins"
+    db_root = Path(__file__).parent.parent.parent / "database/software"
     if not db_root.exists():
-        pytest.skip("database/plugins not found")
+        pytest.skip("database/software not found")
     db = PluginDatabase(db_root)
     plugins = db.load()
     assert len(plugins) > 0
