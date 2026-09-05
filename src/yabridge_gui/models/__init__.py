@@ -14,7 +14,7 @@
 # Licence: GPL3
 # https://github.com/apapamarkou/yabridge-gui-controller
 
-from yabridge_gui.models.free_plugin import FreePlugin
+from yabridge_gui.models.audio_app import AudioApp
 from yabridge_gui.models.plugin import Plugin
 
-__all__ = ["Plugin", "FreePlugin"]
+__all__ = ["Plugin", "AudioApp"]

@@ -14,7 +14,7 @@
 # Licence: GPL3
 # https://github.com/apapamarkou/yabridge-gui-controller
 
-"""Free plugin database model."""
+"""Audio app database model."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from pathlib import Path
 
 
 @dataclass
-class FreePlugin:
+class AudioApp:
     slug: str
     name: str
     developer: str
@@ -37,7 +37,7 @@ class FreePlugin:
     image_path: Path | None = None
 
     @classmethod
-    def from_dict(cls, slug: str, data: dict, image_path: Path | None = None) -> FreePlugin:
+    def from_dict(cls, slug: str, data: dict, image_path: Path | None = None) -> AudioApp:
         return cls(
             slug=slug,
             name=data.get("name", slug),

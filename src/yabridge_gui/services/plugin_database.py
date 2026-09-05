@@ -1,4 +1,4 @@
-"""Filesystem-based free plugin database."""
+"""Filesystem-based audio app database."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from yabridge_gui.models.free_plugin import FreePlugin
+from yabridge_gui.models.audio_app import AudioApp
 
 _IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 
@@ -24,30 +24,30 @@ class PluginDatabase:
                     db_root = candidate
                     break
         self._root = db_root
-        self._cache: list[FreePlugin] | None = None
+        self._cache: list[AudioApp] | None = None
 
-    def load(self) -> list[FreePlugin]:
+    def load(self) -> list[AudioApp]:
         if self._cache is not None:
             return self._cache
         if self._root is None or not self._root.exists():
             return []
-        plugins = []
+        plugins: list[AudioApp] = []
         for entry in sorted(self._root.iterdir()):
             if not entry.is_dir():
                 continue
-            yaml_file = entry / "plugin.yaml"
+            yaml_file = entry / "info.yaml"
             if not yaml_file.exists():
                 continue
             try:
                 data = yaml.safe_load(yaml_file.read_text())
                 image = _find_image(entry)
-                plugins.append(FreePlugin.from_dict(entry.name, data, image))
+                plugins.append(AudioApp.from_dict(entry.name, data, image))
             except Exception:
                 continue
         self._cache = plugins
         return plugins
 
-    def search(self, query: str) -> list[FreePlugin]:
+    def search(self, query: str) -> list[AudioApp]:
         q = query.lower()
         return [
             p
@@ -55,7 +55,7 @@ class PluginDatabase:
             if q in p.name.lower() or q in p.developer.lower() or q in p.category.lower()
         ]
 
-    def by_category(self, category: str) -> list[FreePlugin]:
+    def by_category(self, category: str) -> list[AudioApp]:
         return [p for p in self.load() if p.category.lower() == category.lower()]
 
     def categories(self) -> list[str]:

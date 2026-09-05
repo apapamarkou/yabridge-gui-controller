@@ -14,13 +14,17 @@
 # Licence: GPL3
 # https://github.com/apapamarkou/yabridge-gui-controller
 
-"""Free Plugins browser dialog."""
+"""Audio Apps browser dialog."""
 
 from __future__ import annotations
 
 import subprocess
+import urllib.request
+import zipfile
+from io import BytesIO
+from pathlib import Path
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QComboBox,
@@ -37,17 +41,48 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from yabridge_gui.models.free_plugin import FreePlugin
+from yabridge_gui.models.audio_app import AudioApp
 from yabridge_gui.services.plugin_database import PluginDatabase
 
+_GITHUB_ZIP = "https://github.com/apapamarkou/yabridge-gui-controller/archive/refs/heads/main.zip"
+_DB_PREFIX = "yabridge-gui-controller-main/database/software/"
 
-class FreePluginsDialog(QDialog):
+
+class _UpdateWorker(QThread):
+    finished = pyqtSignal(bool, str)
+
+    def __init__(self, db_root: Path):
+        super().__init__()
+        self._db_root = db_root
+
+    def run(self) -> None:
+        try:
+            with urllib.request.urlopen(_GITHUB_ZIP, timeout=30) as resp:
+                data = resp.read()
+            with zipfile.ZipFile(BytesIO(data)) as zf:
+                entries = [
+                    n for n in zf.namelist() if n.startswith(_DB_PREFIX) and n.endswith("info.yaml")
+                ]
+                if not entries:
+                    self.finished.emit(False, "No info.yaml entries found in archive.")
+                    return
+                for name in entries:
+                    rel = name[len(_DB_PREFIX) :]
+                    dest = self._db_root / rel
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    dest.write_bytes(zf.read(name))
+            self.finished.emit(True, f"Updated {len(entries)} entries.")
+        except Exception as e:
+            self.finished.emit(False, str(e))
+
+
+class AudioAppsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Audio Apps Browser")
         self.setMinimumSize(800, 550)
         self._db = PluginDatabase()
-        self._plugins: list[FreePlugin] = []
+        self._plugins: list[AudioApp] = []
         self._init_ui()
         self._load()
 
@@ -70,6 +105,11 @@ class FreePluginsDialog(QDialog):
         self._list = QListWidget()
         self._list.currentRowChanged.connect(self._show_plugin)
         left.addWidget(self._list)
+
+        self._update_btn = QPushButton("Update Apps List")
+        self._update_btn.clicked.connect(self._update_db)
+        left.addWidget(self._update_btn)
+
         layout.addLayout(left, 1)
 
         # Right: detail panel
@@ -97,9 +137,9 @@ class FreePluginsDialog(QDialog):
             plugins = [p for p in plugins if p.category == cat]
         self._populate(plugins)
 
-    def _populate(self, plugins: list[FreePlugin]) -> None:
+    def _populate(self, plugins: list[AudioApp]) -> None:
         self._list.clear()
-        self._filtered: list[FreePlugin] = plugins
+        self._filtered: list[AudioApp] = plugins
         for p in plugins:
             item = QListWidgetItem(f"{p.name}  [{p.category}]")
             self._list.addItem(item)
@@ -112,6 +152,25 @@ class FreePluginsDialog(QDialog):
         if 0 <= row < len(self._filtered):
             self._detail.set_plugin(self._filtered[row])
 
+    def _update_db(self) -> None:
+        if self._db._root is None:
+            return
+        self._update_btn.setEnabled(False)
+        self._update_btn.setText("Updating…")
+        self._worker = _UpdateWorker(self._db._root)
+        self._worker.finished.connect(self._on_update_done)
+        self._worker.start()
+
+    def _on_update_done(self, ok: bool, msg: str) -> None:
+        self._update_btn.setEnabled(True)
+        self._update_btn.setText("Update Apps List")
+        if ok:
+            self._db._cache = None
+            self._load()
+        from PyQt6.QtWidgets import QMessageBox
+
+        (QMessageBox.information if ok else QMessageBox.warning)(self, "Update", msg)
+
 
 class _PluginDetailWidget(QWidget):
     def __init__(self):
@@ -122,6 +181,8 @@ class _PluginDetailWidget(QWidget):
         self._image = QLabel()
         self._image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._image.setFixedHeight(120)
+        self._image.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._image.mousePressEvent = self._open_image_preview
         layout.addWidget(self._image)
 
         self._name = QLabel()
@@ -157,9 +218,29 @@ class _PluginDetailWidget(QWidget):
         btn_row.addStretch()
         layout.addLayout(btn_row)
 
-        self._plugin: FreePlugin | None = None
+        self._plugin: AudioApp | None = None
+        self._image_path: Path | None = None
 
-    def set_plugin(self, plugin: FreePlugin) -> None:
+    def _open_image_preview(self, event=None) -> None:
+        if not self._image_path or not self._image_path.exists():
+            return
+        from PyQt6.QtWidgets import QDialog, QScrollArea, QVBoxLayout
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle(self._plugin.name if self._plugin else "Image Preview")
+        layout = QVBoxLayout(dlg)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        lbl = QLabel()
+        lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        pix = QPixmap(str(self._image_path))
+        lbl.setPixmap(pix)
+        scroll.setWidget(lbl)
+        layout.addWidget(scroll)
+        dlg.resize(min(pix.width() + 40, 1200), min(pix.height() + 40, 800))
+        dlg.exec()
+
+    def set_plugin(self, plugin: AudioApp) -> None:
         self._plugin = plugin
         self._name.setText(plugin.name)
         self._developer.setText(f"by {plugin.developer}")
@@ -171,11 +252,13 @@ class _PluginDetailWidget(QWidget):
         self._download_btn.setEnabled(bool(plugin.download))
 
         if plugin.image_path and plugin.image_path.exists():
+            self._image_path = plugin.image_path
             pix = QPixmap(str(plugin.image_path)).scaledToHeight(
                 110, Qt.TransformationMode.SmoothTransformation
             )
             self._image.setPixmap(pix)
         else:
+            self._image_path = None
             self._image.setText("(no image)")
 
     def clear(self) -> None:
@@ -189,6 +272,7 @@ class _PluginDetailWidget(QWidget):
             self._platforms,
         ):
             lbl.clear()
+        self._image_path = None
         self._image.clear()
 
     def _open_website(self) -> None:

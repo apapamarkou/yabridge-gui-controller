@@ -85,8 +85,8 @@ class MainWindow(QMainWindow):
         self.setup_button = QPushButton("Setup Assistant")
         self.setup_button.clicked.connect(self._open_setup)
 
-        free_plugins_button = QPushButton("Audio Apps Browser")
-        free_plugins_button.clicked.connect(self._open_free_plugins)
+        audio_apps_button = QPushButton("Audio Apps Browser")
+        audio_apps_button.clicked.connect(self._open_free_plugins)
 
         about_button = QPushButton("About")
         about_button.clicked.connect(self._show_about)
@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
         # Bottom button row
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.setup_button)
-        button_layout.addWidget(free_plugins_button)
+        button_layout.addWidget(audio_apps_button)
         button_layout.addWidget(about_button)
         button_layout.addStretch()
         button_layout.addWidget(quit_button)
@@ -219,9 +219,9 @@ class MainWindow(QMainWindow):
         dlg.exec()
 
     def _open_free_plugins(self) -> None:
-        from yabridge_gui.gui.free_plugins_dialog import FreePluginsDialog
+        from yabridge_gui.gui.audio_apps_dialog import AudioAppsDialog
 
-        dlg = FreePluginsDialog(self)
+        dlg = AudioAppsDialog(self)
         dlg.exec()
 
     def _show_about(self) -> None:
