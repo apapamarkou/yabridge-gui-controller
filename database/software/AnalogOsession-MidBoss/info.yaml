@@ -1,0 +1,18 @@
+name: MidBoss
+developer: Analog Obsession
+description: >
+  MidBoss is mid-frequency targeted saturator and sweetener with 6 different types! While it mostly saturate mid-frequencies, it will shape high-end or low-end response according to selected type.
+category:
+  - Color
+  - Saturation
+  - Harmonic
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/midboss-141665938
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

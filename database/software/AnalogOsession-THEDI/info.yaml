@@ -1,0 +1,18 @@
+name: THEDI
+developer: Analog Obsession
+description: >
+  Famous colored DI BOX in the box! Tighten your low end, enhance mids and add sparkle to high end!
+category:
+  - Color
+  - Saturation
+  - PreAmp
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/thedi-165629782
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

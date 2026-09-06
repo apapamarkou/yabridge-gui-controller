@@ -1,0 +1,18 @@
+name: RazorClip
+developer: Analog Obsession
+description: >
+  Analog based clipper plugin!
+category:
+  - Color
+  - Saturation
+  - Harmonic
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/razorclip-151529497
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

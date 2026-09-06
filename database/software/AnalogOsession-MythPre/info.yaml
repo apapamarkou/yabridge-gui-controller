@@ -1,0 +1,18 @@
+name: MythPre
+developer: Analog Obsession
+description: >
+  Here is custom Tube Mic Preamp with Line, DI and Tone Shaper input features! MythPre is focused on mostly low-end. Intended Low-End Emphasis will give you solid bass response according to input mode.
+category:
+  - Color
+  - Saturation
+  - PreAmp
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/mythpre-126118073
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,18 @@
+name: MoMa
+developer: Analog Obsession
+description: >
+  Here is 'MoMa'! Updated from scratch with component level circuit modeling! It's fully passive mojo box with Glue & Mojo modes based on Ethan Winer’s design “Mojo Maestro”.
+category:
+  - Color
+  - Saturation
+  - PreAmp
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/moma-100041804
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

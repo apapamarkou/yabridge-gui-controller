@@ -52,14 +52,16 @@ class PluginDatabase:
         return [
             p
             for p in self.load()
-            if q in p.name.lower() or q in p.developer.lower() or q in p.category.lower()
+            if q in p.name.lower()
+            or q in p.developer.lower()
+            or any(q in c.lower() for c in p.category)
         ]
 
     def by_category(self, category: str) -> list[AudioApp]:
-        return [p for p in self.load() if p.category.lower() == category.lower()]
+        return [p for p in self.load() if category.lower() in (c.lower() for c in p.category)]
 
     def categories(self) -> list[str]:
-        return sorted({p.category for p in self.load() if p.category})
+        return sorted({c for p in self.load() for c in p.category if c})
 
 
 def _find_image(directory: Path) -> Path | None:

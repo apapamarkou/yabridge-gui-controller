@@ -1,0 +1,17 @@
+
+name: LAEA
+developer: Analog Obsession
+description: >
+  Solid-State Optical Compressor
+category:
+  - Compressor
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/laea-153437904
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

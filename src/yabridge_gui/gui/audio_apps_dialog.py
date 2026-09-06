@@ -37,6 +37,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSizePolicy,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -134,14 +135,14 @@ class AudioAppsDialog(QDialog):
             q = query.lower()
             plugins = [p for p in plugins if q in p.name.lower() or q in p.developer.lower()]
         if cat and cat != "All categories":
-            plugins = [p for p in plugins if p.category == cat]
+            plugins = [p for p in plugins if cat in p.category]
         self._populate(plugins)
 
     def _populate(self, plugins: list[AudioApp]) -> None:
         self._list.clear()
         self._filtered: list[AudioApp] = plugins
         for p in plugins:
-            item = QListWidgetItem(f"{p.name}  [{p.category}]")
+            item = QListWidgetItem(f"{p.name}  [{', '.join(p.category)}]")
             self._list.addItem(item)
         if plugins:
             self._list.setCurrentRow(0)
@@ -197,9 +198,10 @@ class _PluginDetailWidget(QWidget):
         self._category = QLabel()
         layout.addWidget(self._category)
 
-        self._description = QLabel()
-        self._description.setWordWrap(True)
-        self._description.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self._description = QTextEdit()
+        self._description.setReadOnly(True)
+        self._description.setFixedHeight(200)
+        self._description.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         layout.addWidget(self._description)
 
         self._formats = QLabel()
@@ -244,8 +246,8 @@ class _PluginDetailWidget(QWidget):
         self._plugin = plugin
         self._name.setText(plugin.name)
         self._developer.setText(f"by {plugin.developer}")
-        self._category.setText(f"Category: {plugin.category}")
-        self._description.setText(plugin.description)
+        self._category.setText(f"Category: {', '.join(plugin.category)}")
+        self._description.setPlainText(plugin.description)
         self._formats.setText(f"Formats: {', '.join(plugin.formats)}")
         self._platforms.setText(f"Platforms: {', '.join(plugin.platforms)}")
         self._website_btn.setEnabled(bool(plugin.website))

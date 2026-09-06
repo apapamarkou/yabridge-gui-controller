@@ -1,0 +1,18 @@
+name: LOVEND
+developer: Analog Obsession
+description: >
+  Continuous frequencies and continuous boost. Great for materials for weak low-end. You will get low bump directly when you load plugin. Then, you can choose your frequency and boost according to your need.
+category:
+  - Color
+  - Harmonic
+  - Bass Enhancer
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/lovend-34669483
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

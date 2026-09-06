@@ -1,0 +1,19 @@
+name: Color Bundle
+developer: Analog Obsession
+description: >
+  Distox: Multi-mode distortion plugin. A tube and an op-amp circuit with different op-amps and tubes.
+  PreBOX: Ultimate preamp - distortion box is fully updated from scratch, now!
+category:
+  - Color
+  - Saturation
+  - PreAmp
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/color-bundle-97654574
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

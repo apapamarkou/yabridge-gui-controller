@@ -1,0 +1,17 @@
+name: TheBus
+developer: Analog Obsession
+description: >
+  TheBus is my own custom compressor with well-known UI. It's usable with any source. Not only busses!
+  Soft character and knee with linear frequency response. Especially, great from drums, percussions, choirs or anything needs glue!
+category:
+  - Compressor
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/thebus-163129163
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

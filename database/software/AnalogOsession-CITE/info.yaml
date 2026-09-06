@@ -1,0 +1,18 @@
+name: CITE
+developer: Analog Obsession
+description: >
+  Easy to use High Frequency Processor! It's fully custom design. Based on NOTHING! High-Mids & Highs will love it!
+category:
+  - Color
+  - Saturation
+  - Harmonic
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/cite-105307600
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

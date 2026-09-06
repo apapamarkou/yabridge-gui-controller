@@ -1,0 +1,17 @@
+name: MuChild
+developer: Analog Obsession
+description: >
+  Holy Grail of compressors!
+  MuChild brings iconic vintage compressor with extra features like side-chain filter, external side-chain and wet-dry blend!
+category:
+  - Compressor
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/muchild-157419821
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

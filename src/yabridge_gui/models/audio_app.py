@@ -28,9 +28,9 @@ class AudioApp:
     name: str
     developer: str
     description: str
-    category: str
-    website: str
-    download: str
+    category: list[str] = field(default_factory=list)
+    website: str = ""
+    download: str = ""
     formats: list[str] = field(default_factory=list)
     platforms: list[str] = field(default_factory=list)
     free: bool = True
@@ -43,7 +43,7 @@ class AudioApp:
             name=data.get("name", slug),
             developer=data.get("developer", ""),
             description=data.get("description", ""),
-            category=data.get("category", ""),
+            category=data.get("category") if isinstance(data.get("category"), list) else ([data["category"]] if data.get("category") else []),
             website=data.get("website", ""),
             download=data.get("download", ""),
             formats=data.get("formats", []),

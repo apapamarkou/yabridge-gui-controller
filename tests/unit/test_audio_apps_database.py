@@ -24,7 +24,7 @@ def test_audio_app_from_dict():
     assert app.slug == "test-synth"
     assert app.name == "Test Synth"
     assert app.developer == "Test Dev"
-    assert app.category == "Synthesizer"
+    assert app.category == ["Synthesizer"]
     assert "VST3" in app.formats
     assert app.free is True
 
@@ -89,7 +89,7 @@ def test_plugin_database_categories(tmp_path):
     for slug, cat in [("synth-a", "Synthesizer"), ("fx-b", "Effect")]:
         d = tmp_path / slug
         d.mkdir()
-        (d / "info.yaml").write_text(yaml.dump({"name": slug, "category": cat}))
+        (d / "info.yaml").write_text(yaml.dump({"name": slug, "category": [cat]}))
     db = PluginDatabase(tmp_path)
     cats = db.categories()
     assert "Synthesizer" in cats

@@ -1,0 +1,19 @@
+name: TuPre
+developer: Analog Obsession
+description: >
+  Tube line amp with custom passive program equalizer. Colorful and solid design for you!
+category:
+  - Color
+  - Saturation
+  - PreAmp
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/nos-bundle-49184069
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

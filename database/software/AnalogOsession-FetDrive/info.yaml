@@ -1,0 +1,17 @@
+name: FetDrive
+developer: Analog Obsession
+description: >
+  Classic FET Compressor’s Saturation
+category:
+  - Color
+  - Saturation
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/fet-bundle-51962024
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

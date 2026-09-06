@@ -1,0 +1,20 @@
+name: EDComp
+developer: Analog Obsession
+description: >
+  Pre-emphasis and De-emphasis based compressor with 'CLEAN' mode.
+  EDComp has S-Type based channel compressor trick with ratio and threshold. This means while threshold fixed at high value, ratio will start from 1:1 and goes up to 10:1. This will give you smoother control with better leveling.
+  EDComp will emphasis and de-emphasis lows and high in ED mode. This is kind of tilt eq but not at exact frequencies while emphasis and de-emphasis. Carefully selected frequencies and boost/cut values especially for vocals but usable with any source.
+  CL mode has no emphasis and de-emphasis.
+  Attack and release fixed at 15 ms and 80 ms.
+category:
+  - Compressor
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/edcomp-129902016
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true
