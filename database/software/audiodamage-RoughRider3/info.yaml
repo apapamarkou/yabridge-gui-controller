@@ -1,0 +1,20 @@
+name: RoughRider3
+developer: Audiodamage
+description: >
+  RoughRider3 is our free compressor, and it's the one that's been flattening drums since 2008. It's a character box, not a clean one — it colors, it warms, and at the far end of the ratio knob it does something closer to demolition than compression. You get a logarithmic ratio that runs from gentle all the way to 1:1000, attack and release set by ear, a sidechain input with its own HPF, and a FULL BANDWIDTH switch that pulls the warming filter out when you want the squeeze without the color. Park it on a drum bus, a synth, a bassline, or a whole mix.
+category:
+  - Compressor
+  - Dynamics
+website: https://www.audiodamage.com/
+download: https://www.audiodamage.com/pages/roughrider3
+formats:
+  - Clap
+  - VST3
+  - AU
+  - AAX Native
+  - LV2
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,16 @@
+name: Axon
+developer: Audiodamage
+description: >
+  Axon Neural Network Drum Machine
+category:
+  - Synthesizer
+website: https://www.audiodamage.com/
+download: https://www.audiodamage.com/pages/free-and-legacy
+formats:
+  - VST/VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

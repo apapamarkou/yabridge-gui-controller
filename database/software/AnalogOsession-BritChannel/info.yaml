@@ -1,0 +1,17 @@
+name: BritChannel
+developer: Analog Obsession
+description: >
+  Classic British Equalizer & Preamp with Line & Mic input!
+category:
+  - Preamp
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/graphack-80663451
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true
