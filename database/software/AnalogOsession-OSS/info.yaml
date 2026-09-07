@@ -1,12 +1,12 @@
-name: COMPER
+name: OSS
 developer: Analog Obsession
 description: >
-  "Multi-Mode", "Serial Compression" with "Switchable" and "Blendable" circuits!
+  176 style compressor with improved sidechain section!
 category:
   - Compressor
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/comper-74729047
+download: https://www.patreon.com/posts/oss-34292591
 formats:
   - VST3
   - AU

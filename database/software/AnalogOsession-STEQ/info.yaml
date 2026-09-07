@@ -1,0 +1,16 @@
+name: STEQ
+developer: Analog Obsession
+description: >
+  Small format console eq from well known tape machine brand
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/steq-35318911
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,16 @@
+name: INDEQ
+developer: Analog Obsession
+description: >
+  Pure inductor based equalizer!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/indeq-135944425
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,16 @@
+name: TILTA
+developer: Analog Obsession
+description: >
+  Easy to use Tilt Equalizer! No need any other words!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/tilta-63538579
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

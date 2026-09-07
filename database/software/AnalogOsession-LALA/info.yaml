@@ -1,12 +1,12 @@
-name: COMPER
+name: LALA
 developer: Analog Obsession
 description: >
-  "Multi-Mode", "Serial Compression" with "Switchable" and "Blendable" circuits!
+  LA2A style compressor. The go-to vocal compressor & standard in analog world!
 category:
   - Compressor
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/comper-74729047
+download: https://www.patreon.com/posts/lala-36128829
 formats:
   - VST3
   - AU

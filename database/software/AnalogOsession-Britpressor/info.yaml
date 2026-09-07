@@ -1,12 +1,12 @@
-name: COMPER
+name: Britpressor
 developer: Analog Obsession
 description: >
-  "Multi-Mode", "Serial Compression" with "Switchable" and "Blendable" circuits!
+  Classic British Compressor!
 category:
   - Compressor
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/comper-74729047
+download: https://www.patreon.com/posts/britbundle-79798060
 formats:
   - VST3
   - AU

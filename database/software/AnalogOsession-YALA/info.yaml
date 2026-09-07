@@ -1,12 +1,13 @@
-name: COMPER
+name: YALA
 developer: Analog Obsession
 description: >
-  "Multi-Mode", "Serial Compression" with "Switchable" and "Blendable" circuits!
+  Iconic Vari-Mu limiting amplifier with extra features!
 category:
   - Compressor
+  - Limiter
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/comper-74729047
+download: https://www.patreon.com/posts/yala-34323384
 formats:
   - VST3
   - AU

@@ -1,12 +1,13 @@
-name: COMPER
+name: VariMoon
 developer: Analog Obsession
 description: >
-  "Multi-Mode", "Serial Compression" with "Switchable" and "Blendable" circuits!
+  Famous 600 Style Vari-Mu Compressor/Limiter with extra features!
 category:
   - Compressor
+  - Limiter
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/comper-74729047
+download: https://www.patreon.com/posts/varimoon-34323360
 formats:
   - VST3
   - AU

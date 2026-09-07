@@ -1,0 +1,16 @@
+name: SSQ
+developer: Analog Obsession
+description: >
+  Famous console equalizer with 4x oversampling and more features!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/ssq-54598496
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

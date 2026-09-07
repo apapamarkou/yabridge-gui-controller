@@ -1,12 +1,13 @@
-name: COMPER
+name: Kolin
 developer: Analog Obsession
 description: >
-  "Multi-Mode", "Serial Compression" with "Switchable" and "Blendable" circuits!
+  Vintage limiting amplifier with additional features like adjustable attack and release!
 category:
   - Compressor
+  - Limiter
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/comper-74729047
+download: https://www.patreon.com/posts/49184069
 formats:
   - VST3
   - AU

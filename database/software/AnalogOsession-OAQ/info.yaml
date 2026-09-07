@@ -1,0 +1,17 @@
+name: OAQ
+developer: Analog Obsession
+description: >
+  Mastering degree Dual-Mono/Stereo/Mid-Side equalizer
+category:
+  - EQ
+  - Mastering
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/oaq-69993062
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true
