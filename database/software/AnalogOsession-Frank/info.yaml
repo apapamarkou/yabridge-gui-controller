@@ -1,0 +1,16 @@
+name: Frank
+developer: Analog Obsession
+description: >
+  Ultimate analog equalizer is now better than ever!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/f-bundle-83415951
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

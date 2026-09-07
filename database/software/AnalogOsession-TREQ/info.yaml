@@ -1,0 +1,16 @@
+name: TREQ
+developer: Analog Obsession
+description: >
+  T-Style Classic Four Band Equalizer!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/34323331
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

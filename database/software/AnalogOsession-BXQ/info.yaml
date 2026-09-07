@@ -1,0 +1,16 @@
+name: BXQ
+developer: Analog Obsession
+description: >
+  Baxandall EQ with Left/Right & Mid/Side processing
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/35000375
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

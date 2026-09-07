@@ -1,0 +1,16 @@
+name: G395a
+developer: Analog Obsession
+description: >
+  Early 70s discrete/Class A 3-Band EQ with selectable mid and fixed hi/lo frequencies.
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/50059272
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,16 @@
+name: FIVER
+developer: Analog Obsession
+description: >
+  Versatile five bands equalizer with low and high shelf filters and three bands with continuously variable bandwidth.
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/48483719
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,17 @@
+name: N492ME
+developer: Analog Obsession
+description: >
+  4 Band Mastering Equalizer with High Pass Filter
+category:
+  - EQ
+  - Mastering
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/n492me-34323127
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

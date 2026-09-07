@@ -1,0 +1,16 @@
+name: MAXBAX
+developer: Analog Obsession
+description: >
+  Fully passive Baxandall eq with extra Mid band!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/maxbax-64791433
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

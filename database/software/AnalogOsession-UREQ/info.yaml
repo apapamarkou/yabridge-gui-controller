@@ -1,0 +1,16 @@
+name: UREQ
+developer: Analog Obsession
+description: >
+  U-Style Stripped Down Classic Equalizer!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/88488633?pr=true
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

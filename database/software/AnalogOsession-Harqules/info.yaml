@@ -1,0 +1,16 @@
+name: Harqules
+developer: Analog Obsession
+description: >
+  Colorfully smooth eq with silky highs. Shape your sound as you want with smooth character.
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/34306427
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

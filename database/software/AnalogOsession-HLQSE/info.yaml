@@ -1,0 +1,16 @@
+name: HLQSE
+developer: Analog Obsession
+description: >
+  Type 69 style eq with discrete bands. So, you can boost or cut bands at the same time!
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/34292290
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,16 @@
+name: BLENDEQ
+developer: Analog Obsession
+description: >
+  “Dual-Circuit” analog modeling equalizer with “Blendable” bands.
+category:
+  - EQ
+website: https://analogobsession.com/
+download: https://www.patreon.com/posts/67460087
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true
