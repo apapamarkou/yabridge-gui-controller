@@ -1,13 +1,13 @@
-
-name: LAEA
+name: FETish
 developer: Analog Obsession
 description: >
-  Solid-State Optical Compressor
+  Classic FET Compressor/Limiter with extra features!
 category:
   - Compressor
+  - Limiter
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/laea-153437904
+download: https://www.patreon.com/analogobsession/posts/fet-bundle-51962024
 formats:
   - VST3
   - AU

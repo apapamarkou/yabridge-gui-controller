@@ -1,0 +1,17 @@
+name: dBComp
+developer: Analog Obsession
+description: >
+  Great drum compressor/limiter for studio and live use! Also, use with acoustic/electric guitar and bass guitar to add snap!
+category:
+  - Compressor
+  - Dynamics
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/dbcomp-56933944
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

@@ -1,0 +1,17 @@
+name: LOADES
+developer: Analog Obsession
+description: >
+  Smooth but powerful de-esser with MIX feature! While you can de-ess your vocals, you can also reduce harshness of your highs for overall mix, cymbals and more! Instead de-esser, you can use it as high frequency "tamer" to get warmer sounds.
+category:
+  - De-Ess
+  - Dynamics
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/loades-62370686
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

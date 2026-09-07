@@ -1,0 +1,18 @@
+name: FetCB
+developer: Analog Obsession
+description: >
+  Forgotten Beast Alive! 70s era FET Limiter/Compressor from UK! Colorful and all around Limiter/Compressor for every source. It was my first re-design while I build hardwares. But in digital version, I changed little bit. Just removed INPUT and added THRESHOLD. Normally, THRESHOLD is fixed and you can adjust compression level by driving INPUT. Now, it's more versatile but still colorful!
+category:
+  - Compressor
+  - Limiter
+  - Dynamics
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/fetcb-92444426
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

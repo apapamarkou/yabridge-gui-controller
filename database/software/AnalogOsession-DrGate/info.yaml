@@ -1,13 +1,12 @@
-
-name: LAEA
+name: DrGate
 developer: Analog Obsession
 description: >
-  Solid-State Optical Compressor
+  Drum Specific Gate Plug-in.
 category:
-  - Compressor
+  - Gate
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/laea-153437904
+download: https://www.patreon.com/analogobsession/posts/drgate-116225259
 formats:
   - VST3
   - AU

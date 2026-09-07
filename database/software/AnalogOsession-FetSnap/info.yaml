@@ -1,13 +1,11 @@
-
-name: LAEA
+name: FetSnap
 developer: Analog Obsession
 description: >
-  Solid-State Optical Compressor
+  Modified side-chain from classic FET Compressor to create transient designer!
 category:
-  - Compressor
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/laea-153437904
+download: https://www.patreon.com/analogobsession/posts/fet-bundle-51962024
 formats:
   - VST3
   - AU

@@ -1,13 +1,13 @@
-
-name: LAEA
+name: COMPER
 developer: Analog Obsession
 description: >
-  Solid-State Optical Compressor
+  "Multi-Mode", "Serial Compression" with "Switchable" and "Blendable" circuits!
 category:
   - Compressor
+  - Limiter
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/laea-153437904
+download: https://www.patreon.com/analogobsession/posts/comper-74729047
 formats:
   - VST3
   - AU

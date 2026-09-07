@@ -1,0 +1,18 @@
+
+name: ATTRACTOR
+developer: Analog Obsession
+description: >
+  Dynamic processor with transient manipulation! Attractor will process incoming signal as two parts. So, you will be able to process Attack and Release parts independently.
+category:
+  - Compressor
+  - Dynamics
+website: https://analogobsession.com/
+download: https://www.patreon.com/analogobsession/posts/attractor-122556016
+formats:
+  - VST3
+  - AU
+  - AAX Native
+platforms:
+  - Windows
+  - macOS
+free: true

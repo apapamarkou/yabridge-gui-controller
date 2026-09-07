@@ -1,13 +1,11 @@
-
-name: LAEA
+name: TRAX
 developer: Analog Obsession
 description: >
-  Solid-State Optical Compressor
+  Easy to use and versatile transient designer!
 category:
-  - Compressor
   - Dynamics
 website: https://analogobsession.com/
-download: https://www.patreon.com/analogobsession/posts/laea-153437904
+download: https://www.patreon.com/analogobsession/posts/trax-70970958
 formats:
   - VST3
   - AU
