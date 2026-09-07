@@ -1,5 +1,5 @@
 name: ShinRonin
-developer: Audiodamage
+developer: Audio Damage
 description: >
   ShinRonin is a ground-up rebuild of Ronin, one of the earliest plugins we ever shipped, first released in 2003. The original paired two delay lines with a set of morphing filters and two fully patchable routing matrices, and it earned a cult following for the strange feedback networks and self-oscillating textures you could build inside it. Twenty years on, we have rebuilt it for modern systems, kept the architecture that made it worth remembering, and released it for free.
   Two independent delay lines, each with tempo sync, reverse, looping, and feedback, feed a pair of morphing multimode filters that sweep continuously from notch through lowpass, bandpass, and highpass. There is saturation, two LFOs, and an envelope follower. Everything connects through two on-board matrices: a signal matrix that routes any audio source to any destination, and a modulation matrix that wires the LFOs, envelope, and incoming MIDI to nearly any parameter. It is happy doing clean stereo delays and gentle filtering, but the real fun starts when you patch a feedback loop and let it misbehave.

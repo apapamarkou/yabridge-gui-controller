@@ -11,4 +11,4 @@ platforms:
   - Linux
   - Windows
   - macOS
-free: true
+free: false
