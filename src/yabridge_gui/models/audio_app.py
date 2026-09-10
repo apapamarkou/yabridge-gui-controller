@@ -43,7 +43,9 @@ class AudioApp:
             name=data.get("name", slug),
             developer=data.get("developer", ""),
             description=data.get("description", ""),
-            category=data.get("category") if isinstance(data.get("category"), list) else ([data["category"]] if data.get("category") else []),
+            category=data.get("category")
+            if isinstance(data.get("category"), list)
+            else ([data["category"]] if data.get("category") else []),
             website=data.get("website", ""),
             download=data.get("download", ""),
             formats=data.get("formats", []),
