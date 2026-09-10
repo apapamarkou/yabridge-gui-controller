@@ -282,9 +282,7 @@ class BaseInstaller(ABC):
         profile_content = profile.read_text() if profile.exists() else ""
         lines_to_add = []
         if ".local/share/yabridge" not in profile_content:
-            lines_to_add.append(
-                f'export PATH="$PATH:$HOME/.local/share/yabridge"'
-            )
+            lines_to_add.append('export PATH="$PATH:$HOME/.local/share/yabridge"')
         if f"wine-staging-{WINE_VERSION}" not in profile_content:
             lines_to_add.append(
                 f'export PATH="$PATH:$HOME/.local/share/wine-staging-{WINE_VERSION}/bin"'
