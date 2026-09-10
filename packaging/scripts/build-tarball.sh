@@ -21,6 +21,8 @@ cp "$REPO_ROOT/src/yabridge-gui-controller.png"                 "$STAGING/"
 cp "$REPO_ROOT/README.md"                                       "$STAGING/"
 cp "$REPO_ROOT/install"                                         "$STAGING/install"
 chmod +x "$STAGING/install"
+cp "$REPO_ROOT/uninstall"                                       "$STAGING/uninstall"
+chmod +x "$STAGING/uninstall"
 
 echo "→ Creating tarball"
 tar -czf "$OUTPUT/$NAME.tar.gz" -C "$OUTPUT" "$NAME"

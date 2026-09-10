@@ -168,6 +168,8 @@ mkdir -p "$ICONS_DIR" "$APPS_DIR"
 if [[ "$MODE" == "tarball" ]]; then
     cp "$SCRIPT_DIR/yabridge-gui-controller.png" "$ICONS_DIR/"
     cp "$SCRIPT_DIR/yabridge-gui-controller.desktop" "$APPS_DIR/"
+    sed -i "s|^Exec=.*|Exec=$HOME/.local/bin/yabridge-gui-controller|" \
+        "$APPS_DIR/yabridge-gui-controller.desktop"
 else
     cp "$SCRIPT_DIR/src/yabridge-gui-controller.png"                        "$ICONS_DIR/"
     cp "$SCRIPT_DIR/packaging/specs/yabridge-gui-controller.desktop"        "$APPS_DIR/"
