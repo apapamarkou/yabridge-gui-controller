@@ -87,7 +87,7 @@ def detect_distribution() -> Distribution:
     # Determine if supported
     if raw_id == "arch":
         supported = True
-        doc_file = "arch.md"
+        doc_file = "Arch.md"
     elif (raw_id, version) in _SUPPORTED_COMBOS:
         supported = True
         doc_file = _doc_for(raw_id)
@@ -98,7 +98,7 @@ def detect_distribution() -> Distribution:
             raw_id == sid and (sv == version or sv.split(".")[0] == major)
             for sid, sv in _SUPPORTED_COMBOS
         )
-        doc_file = _doc_for(raw_id) if supported else "others.md"
+        doc_file = _doc_for(raw_id) if supported else "LinuxProAudioSetup.md"
 
     return Distribution(
         id=raw_id,
@@ -112,8 +112,8 @@ def detect_distribution() -> Distribution:
 
 def _doc_for(distro_id: str) -> str:
     return {
-        "debian": "debian13.md",
-        "ubuntu": "ubuntu2604.md",
-        "fedora": "fedora44.md",
-        "arch": "arch.md",
-    }.get(distro_id, "others.md")
+        "debian": "Debian13.md",
+        "ubuntu": "Ubuntu26.04.md",
+        "fedora": "Fedora44.md",
+        "arch": "Arch.md",
+    }.get(distro_id, "LinuxProAudioSetup.md")

@@ -66,6 +66,9 @@ _SETUP_ORDER: list[str] = [
     "wireplumber",  # 9
 ]
 
+# Steps that can be fixed at any time without waiting for their turn
+_ALWAYS_FIXABLE = {"profile_paths", "audio_group", "rt_limits"}
+
 # Index of first phase-2 step (needs logout before proceeding)
 _PHASE2_START = 5
 
@@ -168,21 +171,18 @@ class SetupDialog(QDialog):
         return len(_SETUP_ORDER)  # all done
 
     def _needs_logout_before_phase2(self) -> bool:
-        """True when phase-1 is done but PATH/audio group are not yet active in session."""
+        """True when phase-1 is done but PATH/audio group/rt_limits are not yet active."""
         active = self._active_step_index()
         if active < _PHASE2_START:
             return False
         profile = self._check_by_name("profile_paths")
         audio = self._check_by_name("audio_group")
-        profile_pending = (
-            profile is not None
-            and profile.status == CheckStatus.WARNING
-            and bool(profile.logout_warning)
+        rt = self._check_by_name("rt_limits")
+        return (
+            (profile is not None and profile.status == CheckStatus.WARNING and bool(profile.logout_warning))
+            or (audio is not None and audio.status == CheckStatus.WARNING and bool(audio.logout_warning))
+            or (rt is not None and rt.status == CheckStatus.WARNING and bool(rt.logout_warning))
         )
-        audio_pending = (
-            audio is not None and audio.status == CheckStatus.WARNING and bool(audio.logout_warning)
-        )
-        return profile_pending or audio_pending
 
     # ------------------------------------------------------------------
     # Refresh / row building
@@ -195,8 +195,9 @@ class SetupDialog(QDialog):
         # Update logout banner
         if self._needs_logout_before_phase2():
             self._logout_banner.setText(
-                "⟳  PATH or audio group changes are pending a session restart. "
-                "Please <b>logout and log back in</b>, then continue setup from step 6 onwards."
+                "⟳  PATH, audio group, or realtime limit changes are pending a session restart. "
+                "You can still fix these items above, but please <b>logout and log back in</b> "
+                "(or restart) before continuing to the next steps."
             )
             self._logout_banner.show()
         else:
@@ -209,10 +210,16 @@ class SetupDialog(QDialog):
 
         active_idx = self._active_step_index()
         waiting_logout = self._needs_logout_before_phase2()
+        wine_ok = all(
+            c.status == CheckStatus.OK
+            for c in self._checks
+            if c.name in ("wine", "yabridge")
+        )
         for check in self._checks:
             step_idx = _SETUP_ORDER.index(check.name) if check.name in _SETUP_ORDER else -1
-            btn_enabled = step_idx == active_idx and not (
-                waiting_logout and step_idx >= _PHASE2_START
+            always_fixable = check.name in _ALWAYS_FIXABLE and wine_ok
+            btn_enabled = always_fixable or (
+                step_idx == active_idx and not (waiting_logout and step_idx >= _PHASE2_START)
             )
             self._checks_layout.addWidget(self._make_check_row(check, btn_enabled))
 
@@ -496,13 +503,19 @@ class SetupDialog(QDialog):
     def _open_docs(self) -> None:
         import subprocess
 
-        doc_file = self._distro.doc_file or "others.md"
+        doc_file = self._distro.doc_file or "LinuxProAudioSetup.md"
+        src_root = Path(__file__).parent.parent.parent.parent
         candidates = [
-            Path(__file__).parent.parent.parent.parent / doc_file,
+            src_root / "docs" / "distros" / doc_file,
+            src_root / "docs" / doc_file,
             Path(f"/usr/share/doc/yabridge-gui-controller/{doc_file}"),
         ]
         for p in candidates:
             if p.exists():
                 subprocess.Popen(["xdg-open", str(p)])
                 return
-        QMessageBox.information(self, "Documentation", f"Documentation file not found: {doc_file}")
+        _BASE = "https://github.com/apapamarkou/yabridge-gui-controller/blob/main/docs"
+        _DISTRO_FILES = {"Arch.md", "Debian13.md", "Fedora44.md", "Ubuntu26.04.md"}
+        folder = "distros" if doc_file in _DISTRO_FILES else ""
+        url = f"{_BASE}/{folder}/{doc_file}" if folder else f"{_BASE}/{doc_file}"
+        subprocess.Popen(["xdg-open", url])

@@ -1,0 +1,14 @@
+name: MixBus
+developer: Harrison Audio
+description: >
+  a Digital Audio Workstation that channels Harrison’s 50-year legacy into a powerful music production suite. Experience our signature analog console-inspired sound and workflow, now enhanced with a suite of powerful new tools designed to supercharge your creativity.
+category: DAW
+website: https://www.harrisonaudio.com/
+download: https://store.harrisonaudio.com/all-products
+formats:
+  - application
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: false

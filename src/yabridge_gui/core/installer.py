@@ -101,6 +101,7 @@ class BaseInstaller(ABC):
                 f"mkdir -p {YABRIDGE_DIR}",
                 f"curl -L -o /tmp/yabridge-{YABRIDGE_VERSION}.tar.gz {YABRIDGE_URL}",
                 f"tar -xzf /tmp/yabridge-{YABRIDGE_VERSION}.tar.gz -C {YABRIDGE_DIR} --strip-components=1",
+                f"rm -f /tmp/yabridge-{YABRIDGE_VERSION}.tar.gz",
             ],
             requires_sudo=False,
         )
@@ -141,6 +142,7 @@ class BaseInstaller(ABC):
                 f"curl -L -o wine-{WINE_VERSION}-staging-amd64.tar.xz {WINE_URL}",
                 f"mkdir -p {WINE_DIR}",
                 f"tar -xJf wine-{WINE_VERSION}-staging-amd64.tar.xz --strip-components=1 -C {WINE_DIR}",
+                f"rm -f wine-{WINE_VERSION}-staging-amd64.tar.xz",
                 desktop_entry,
             ],
             requires_sudo=False,
@@ -163,7 +165,6 @@ class BaseInstaller(ABC):
             home / ".wine/drive_c/Program Files/VSTPlugins",
         ]
         cmds = [f'yabridgectl add "{d}"' for d in vst_dirs]
-        cmds.append("yabridgectl set --path-auto")
         return InstallPlan(title="Configure yabridge paths", commands=cmds, requires_sudo=False)
 
     def plan_add_audio_group(self) -> InstallPlan:
@@ -187,6 +188,7 @@ class BaseInstaller(ABC):
                 f"wget -O /tmp/winetricks {winetricks_url}",
                 "chmod +x /tmp/winetricks",
                 "/tmp/winetricks vcrun6sp6",
+                "rm -f /tmp/winetricks",
                 'wine reg add "HKCU\\Control Panel\\Desktop" /v LogPixels /t REG_DWORD /d 125 /f',
                 "winecfg",
             ],
@@ -243,7 +245,7 @@ class BaseInstaller(ABC):
             tmp_name = tmp.name
         return InstallPlan(
             title="Configure realtime limits (auto)",
-            commands=[f"pkexec cp {tmp_name} {limits_file}"],
+            commands=[f"pkexec cp {tmp_name} {limits_file}", f"rm -f {tmp_name}"],
             requires_sudo=True,
         )
 
