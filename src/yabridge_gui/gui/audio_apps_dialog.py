@@ -215,6 +215,7 @@ class _PluginDetailWidget(QWidget):
         self._website_btn.clicked.connect(self._open_website)
         self._download_btn = QPushButton("Download")
         self._download_btn.clicked.connect(self._open_download)
+        self._download_btn.setStyleSheet("font-weight: bold; padding: 4px 14px;")
         btn_row.addWidget(self._website_btn)
         btn_row.addWidget(self._download_btn)
         btn_row.addStretch()
@@ -251,7 +252,24 @@ class _PluginDetailWidget(QWidget):
         self._formats.setText(f"Formats: {', '.join(plugin.formats)}")
         self._platforms.setText(f"Platforms: {', '.join(plugin.platforms)}")
         self._website_btn.setEnabled(bool(plugin.website))
-        self._download_btn.setEnabled(bool(plugin.download))
+        if plugin.download:
+            if plugin.free:
+                self._download_btn.setText("⬇  Free Download")
+                self._download_btn.setStyleSheet(
+                    "font-weight: bold; padding: 4px 14px;"
+                    "color: white; background-color: #2e7d32;"
+                )
+            else:
+                self._download_btn.setText(f"🛒  Buy {plugin.name}")
+                self._download_btn.setStyleSheet(
+                    "font-weight: bold; padding: 4px 14px;"
+                    "color: white; background-color: #1565c0;"
+                )
+            self._download_btn.setEnabled(True)
+        else:
+            self._download_btn.setText("Download")
+            self._download_btn.setStyleSheet("font-weight: bold; padding: 4px 14px;")
+            self._download_btn.setEnabled(False)
 
         if plugin.image_path and plugin.image_path.exists():
             self._image_path = plugin.image_path

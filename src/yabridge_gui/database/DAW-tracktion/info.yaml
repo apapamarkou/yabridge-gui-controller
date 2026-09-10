@@ -1,0 +1,14 @@
+name: Tracktion Waveform
+developer: Julian Storer
+description: >
+  Tracktion is a cross-platform digital audio workstation (DAW) developed by Tracktion Software that supports macOS, Windows, Linux, and Raspberry Pi.  It operates on a freemium model, offering a completely free version with unlimited tracks and no export restrictions, alongside a paid Pro version that adds advanced plugins and expansion packs
+category: DAW
+website: https://www.tracktion.com/
+download: https://www.tracktion.com/products/waveform-free
+formats:
+  - application
+platforms:
+  - Linux
+  - Windows
+  - macOS
+free: true
