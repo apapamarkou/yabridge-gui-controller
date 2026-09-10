@@ -10,13 +10,16 @@ from yabridge_gui.models.audio_app import AudioApp
 
 _IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 
+USER_DB_ROOT = Path.home() / ".local" / "share" / "yabridge-gui-controller" / "database"
+
 
 class PluginDatabase:
     def __init__(self, db_root: Path | None = None):
         if db_root is None:
             here = Path(__file__).parent
             for candidate in [
-                here.parent / "database",                                 # installed package
+                USER_DB_ROOT,  # user-updated database
+                here.parent / "database",  # installed package
                 Path("/usr/share/yabridge-gui-controller/database"),
             ]:
                 if candidate.exists():

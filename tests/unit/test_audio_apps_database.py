@@ -41,9 +41,9 @@ def test_plugin_database_loads_real_db():
     """Test that the real database directory loads without errors."""
     from pathlib import Path
 
-    db_root = Path(__file__).parent.parent.parent / "database/software"
+    db_root = Path(__file__).parent.parent.parent / "src" / "yabridge_gui" / "database"
     if not db_root.exists():
-        pytest.skip("database/software not found")
+        pytest.skip("src/yabridge_gui/database not found")
     db = PluginDatabase(db_root)
     apps = db.load()
     assert len(apps) > 0

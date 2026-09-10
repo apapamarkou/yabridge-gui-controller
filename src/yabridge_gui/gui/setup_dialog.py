@@ -27,7 +27,6 @@ from PyQt6.QtWidgets import (
     QDialogButtonBox,
     QHBoxLayout,
     QLabel,
-    QMessageBox,
     QPushButton,
     QScrollArea,
     QSizePolicy,
@@ -179,8 +178,16 @@ class SetupDialog(QDialog):
         audio = self._check_by_name("audio_group")
         rt = self._check_by_name("rt_limits")
         return (
-            (profile is not None and profile.status == CheckStatus.WARNING and bool(profile.logout_warning))
-            or (audio is not None and audio.status == CheckStatus.WARNING and bool(audio.logout_warning))
+            (
+                profile is not None
+                and profile.status == CheckStatus.WARNING
+                and bool(profile.logout_warning)
+            )
+            or (
+                audio is not None
+                and audio.status == CheckStatus.WARNING
+                and bool(audio.logout_warning)
+            )
             or (rt is not None and rt.status == CheckStatus.WARNING and bool(rt.logout_warning))
         )
 
@@ -211,9 +218,7 @@ class SetupDialog(QDialog):
         active_idx = self._active_step_index()
         waiting_logout = self._needs_logout_before_phase2()
         wine_ok = all(
-            c.status == CheckStatus.OK
-            for c in self._checks
-            if c.name in ("wine", "yabridge")
+            c.status == CheckStatus.OK for c in self._checks if c.name in ("wine", "yabridge")
         )
         for check in self._checks:
             step_idx = _SETUP_ORDER.index(check.name) if check.name in _SETUP_ORDER else -1

@@ -14,7 +14,7 @@
     - Saturation
   ```
 - Image thumbnail is now clickable — opens a full-size scrollable preview window
-- Added "Update Apps List" button at the bottom of the left panel — downloads the latest `database/software/` entries from the GitHub `main` branch and refreshes the list
+- Added "Update Apps List" button at the bottom of the left panel — downloads the latest database entries from the GitHub `main` branch and saves them to `~/.local/share/yabridge-gui-controller/database/`, then refreshes the list
 
 ### Database
 

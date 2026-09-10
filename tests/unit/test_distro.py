@@ -103,7 +103,7 @@ def test_arch_detected():
 def test_unknown_distro_unsupported():
     distro = _mock_detect(OS_RELEASE_UNKNOWN)
     assert distro.supported is False
-    assert distro.doc_file == "others.md"
+    assert distro.doc_file == "LinuxProAudioSetup.md"
 
 
 def test_distribution_dataclass():

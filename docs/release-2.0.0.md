@@ -74,7 +74,7 @@ winecfg
 
 ### Audio Apps Browser
 
-- Curated YAML database under `database/software/`
+- Curated YAML database under `src/yabridge_gui/database/`
 - Each entry: name, developer, category, description, formats, website, download link, optional image
 - Searchable and filterable by category inside the application
 

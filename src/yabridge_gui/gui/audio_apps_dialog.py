@@ -43,10 +43,13 @@ from PyQt6.QtWidgets import (
 )
 
 from yabridge_gui.models.audio_app import AudioApp
-from yabridge_gui.services.plugin_database import PluginDatabase
+from yabridge_gui.services.plugin_database import USER_DB_ROOT, PluginDatabase
 
 _GITHUB_ZIP = "https://github.com/apapamarkou/yabridge-gui-controller/archive/refs/heads/main.zip"
 _DB_PREFIX = "yabridge-gui-controller-main/src/yabridge_gui/database/"
+
+
+_IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 
 
 class _UpdateWorker(QThread):
@@ -61,18 +64,23 @@ class _UpdateWorker(QThread):
             with urllib.request.urlopen(_GITHUB_ZIP, timeout=30) as resp:
                 data = resp.read()
             with zipfile.ZipFile(BytesIO(data)) as zf:
-                entries = [
-                    n for n in zf.namelist() if n.startswith(_DB_PREFIX) and n.endswith("info.yaml")
+                all_entries = [
+                    n
+                    for n in zf.namelist()
+                    if n.startswith(_DB_PREFIX)
+                    and not n.endswith("/")
+                    and (n.endswith("info.yaml") or any(n.endswith(e) for e in _IMAGE_EXTS))
                 ]
-                if not entries:
+                yaml_entries = [n for n in all_entries if n.endswith("info.yaml")]
+                if not yaml_entries:
                     self.finished.emit(False, "No info.yaml entries found in archive.")
                     return
-                for name in entries:
+                for name in all_entries:
                     rel = name[len(_DB_PREFIX) :]
                     dest = self._db_root / rel
                     dest.parent.mkdir(parents=True, exist_ok=True)
                     dest.write_bytes(zf.read(name))
-            self.finished.emit(True, f"Updated {len(entries)} entries.")
+            self.finished.emit(True, f"Updated {len(yaml_entries)} entries.")
         except Exception as e:
             self.finished.emit(False, str(e))
 
@@ -154,11 +162,9 @@ class AudioAppsDialog(QDialog):
             self._detail.set_plugin(self._filtered[row])
 
     def _update_db(self) -> None:
-        if self._db._root is None:
-            return
         self._update_btn.setEnabled(False)
         self._update_btn.setText("Updating…")
-        self._worker = _UpdateWorker(self._db._root)
+        self._worker = _UpdateWorker(USER_DB_ROOT)
         self._worker.finished.connect(self._on_update_done)
         self._worker.start()
 
@@ -256,14 +262,12 @@ class _PluginDetailWidget(QWidget):
             if plugin.free:
                 self._download_btn.setText("⬇  Free Download")
                 self._download_btn.setStyleSheet(
-                    "font-weight: bold; padding: 4px 14px;"
-                    "color: white; background-color: #2e7d32;"
+                    "font-weight: bold; padding: 4px 14px;color: white; background-color: #2e7d32;"
                 )
             else:
                 self._download_btn.setText(f"🛒  Buy {plugin.name}")
                 self._download_btn.setStyleSheet(
-                    "font-weight: bold; padding: 4px 14px;"
-                    "color: white; background-color: #1565c0;"
+                    "font-weight: bold; padding: 4px 14px;color: white; background-color: #1565c0;"
                 )
             self._download_btn.setEnabled(True)
         else:
