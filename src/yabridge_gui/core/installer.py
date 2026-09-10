@@ -219,11 +219,11 @@ class BaseInstaller(ABC):
         except OSError:
             content = ""
         lines_to_add = []
-        if "rtprio" not in content or "@audio" not in content:
+        if "rtprio" not in content:
             lines_to_add.append("@audio           -      rtprio           95")
-        if "memlock" not in content or "@audio" not in content:
+        if "memlock" not in content:
             lines_to_add.append("@audio           -      memlock          unlimited")
-        if "nice" not in content or "@audio" not in content:
+        if "nice" not in content:
             lines_to_add.append("@audio           -      nice             10")
         if not lines_to_add:
             return InstallPlan(
@@ -281,12 +281,13 @@ class BaseInstaller(ABC):
 
         profile_content = profile.read_text() if profile.exists() else ""
         lines_to_add = []
-        if (
-            ".local/share/yabridge" not in profile_content
-            or f"wine-staging-{WINE_VERSION}" not in profile_content
-        ):
+        if ".local/share/yabridge" not in profile_content:
             lines_to_add.append(
-                f'export PATH="$PATH:$HOME/.local/share/yabridge:$HOME/.local/share/wine-staging-{WINE_VERSION}/bin"'
+                f'export PATH="$PATH:$HOME/.local/share/yabridge"'
+            )
+        if f"wine-staging-{WINE_VERSION}" not in profile_content:
+            lines_to_add.append(
+                f'export PATH="$PATH:$HOME/.local/share/wine-staging-{WINE_VERSION}/bin"'
             )
         if "WINEFSYNC" not in profile_content:
             lines_to_add.append("export WINEFSYNC=1")

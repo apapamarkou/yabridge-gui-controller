@@ -183,7 +183,7 @@ gtk-update-icon-cache -f -t "$HOME/.local/share/icons/hicolor" 2>/dev/null || tr
 PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
 PROFILE="$HOME/.profile"
 
-if ! grep -qF "$PATH_LINE" "$PROFILE" 2>/dev/null; then
+if ! grep -q '\.local/bin' "$PROFILE" 2>/dev/null; then
     echo "" >> "$PROFILE"
     echo "$PATH_LINE" >> "$PROFILE"
     ok "Added ~/.local/bin to PATH in $PROFILE"
