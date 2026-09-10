@@ -14,11 +14,10 @@ _IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 class PluginDatabase:
     def __init__(self, db_root: Path | None = None):
         if db_root is None:
-            # Locate database/ relative to the package or project root
             here = Path(__file__).parent
             for candidate in [
-                here.parent.parent.parent / "database/software",
-                Path("/usr/share/yabridge-gui-controller/database/software"),
+                here.parent / "database",                                 # installed package
+                Path("/usr/share/yabridge-gui-controller/database"),
             ]:
                 if candidate.exists():
                     db_root = candidate

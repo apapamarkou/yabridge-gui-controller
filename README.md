@@ -120,12 +120,12 @@ The application includes a curated database of free Windows VST plugins. Each en
 To add a plugin to the database:
 
 ```bash
-mkdir database/software/my-plugin
-# create database/software/my-plugin/plugin.yaml
-# optionally add database/software/my-plugin/image.png
+mkdir src/yabridge_gui/database/software/my-plugin
+# create src/yabridge_gui/database/software/my-plugin/info.yaml
+# optionally add src/yabridge_gui/database/software/my-plugin/image.png
 ```
 
-See existing entries in `database/software/` for the YAML format.
+See existing entries in `src/yabridge_gui/database/software/` for the YAML format.
 
 ---
 

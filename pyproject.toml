@@ -40,7 +40,7 @@ yabridge-gui-controller-gui = "yabridge_gui.__main__:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-yabridge_gui = ["assets/*"]
+yabridge_gui = ["assets/*", "database/**/info.yaml", "database/**/*.png", "database/**/*.jpg", "database/**/*.jpeg", "database/**/*.webp"]
 
 [tool.setuptools_scm]
 write_to = "src/yabridge_gui/_version.py"
