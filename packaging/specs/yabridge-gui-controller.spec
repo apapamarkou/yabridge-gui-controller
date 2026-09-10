@@ -1,5 +1,5 @@
 Name:           yabridge-gui-controller
-Version:        2.0.0
+Version:        2.0.1
 Release:        1%{?dist}
 Summary:        GUI controller for yabridge — manage Windows VST/VST3 plugins on Linux
 
@@ -52,5 +52,23 @@ gtk-update-icon-cache -f -t %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/applications/yabridge-gui-controller.desktop
 
 %changelog
+* Wed Jan 01 2025 Andrianos Papamarkou <andrianos@example.com> - 2.0.1-1
+- Audio Apps Browser: category field now supports multiple tags
+- Audio Apps Browser: image preview clickable, opens full-size window
+- Audio Apps Browser: "Update Apps List" button downloads latest database from GitHub
+- Renamed free_plugin → audio_app, free_plugins_dialog → audio_apps_dialog
+- Renamed database info files from plugin.yaml to info.yaml
+- Setup Assistant: Fix button now appears for PipeWire and WirePlumber MISSING states
+- Setup Assistant: Setup Assistant button turns red for any failing check, not just Wine/yabridge
+- Setup Assistant: button colour refreshes when dialog closes
+- Setup Assistant: confirm dialog is now scrollable (replaced QMessageBox)
+- Setup Assistant: realtime limits checked via /proc/self/limits (effective) not limits.conf
+- Setup Assistant: restart warning shown when limits configured but not yet active
+- Setup Assistant: Wine configuration adds DPI registry key before winecfg
+- Arch: multilib enable step added before Wine install
+- Arch: all pacman commands use --noconfirm
+- RPM: added missing yabridge-gui-controller-gui binary to %files
+- Added make format target
+
 * Wed Jan 01 2025 Andrianos Papamarkou <andrianos@example.com> - 2.0.0-1
 - Initial release
