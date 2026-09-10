@@ -46,7 +46,7 @@ from yabridge_gui.models.audio_app import AudioApp
 from yabridge_gui.services.plugin_database import PluginDatabase
 
 _GITHUB_ZIP = "https://github.com/apapamarkou/yabridge-gui-controller/archive/refs/heads/main.zip"
-_DB_PREFIX = "yabridge-gui-controller-main/database/software/"
+_DB_PREFIX = "yabridge-gui-controller-main/src/yabridge_gui/database/"
 
 
 class _UpdateWorker(QThread):
