@@ -14,9 +14,19 @@
 # Licence: GPL3
 # https://github.com/apapamarkou/yabridge-gui-controller
 
+import re
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
+from pathlib import Path
+
+_pyproject = Path(__file__).parent.parent.parent / "pyproject.toml"
 try:
-    from yabridge_gui._version import version as __version__
-except ImportError:
-    __version__ = "2.0.0"
+    _m = re.search(r'^fallback_version\s*=\s*"([^"]+)"', _pyproject.read_text(), re.MULTILINE)
+    __version__ = _m.group(1) if _m else "unknown"
+except OSError:
+    try:
+        __version__ = _pkg_version("yabridge-gui-controller")
+    except PackageNotFoundError:
+        __version__ = "unknown"
 
 __all__ = ["__version__"]
