@@ -219,11 +219,11 @@ class BaseInstaller(ABC):
         except OSError:
             content = ""
         lines_to_add = []
-        if not any("@audio" in l and "rtprio" in l for l in content.splitlines()):
+        if not any("@audio" in line and "rtprio" in line for line in content.splitlines()):
             lines_to_add.append("@audio           -      rtprio           95")
-        if not any("@audio" in l and "memlock" in l for l in content.splitlines()):
+        if not any("@audio" in line and "memlock" in line for line in content.splitlines()):
             lines_to_add.append("@audio           -      memlock          unlimited")
-        if not any("@audio" in l and "nice" in l for l in content.splitlines()):
+        if not any("@audio" in line and "nice" in line for line in content.splitlines()):
             lines_to_add.append("@audio           -      nice             10")
         if not lines_to_add:
             return InstallPlan(
